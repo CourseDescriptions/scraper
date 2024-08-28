@@ -38,4 +38,38 @@ SITES = {
             "description": ".courseblockdesc p:first-child",
         },
     },
+    "CSU_East_Bay": {
+        "name": "CSU East Bay",
+        "type": "modern_campus",
+        "urlBase": "https://catalog.csueastbay.edu",
+        "startUrl": "https://catalog.csueastbay.edu/content.php?catoid=35&navoid=30996",
+        "selectors": {
+            "code": lambda el: el.select_one("#course_preview_title").text.split(" - ")[
+                0
+            ],
+            "title": lambda el: el.select_one("#course_preview_title").text.split(" - ")[
+                1
+            ],
+            "description": lambda el: el.select_one(
+                "#course_preview_title ~ br"
+            ).nextSibling,
+        },
+    },
+    "Fresno_State": {
+        "name": "Fresno State",
+        "type": "modern_campus",
+        "urlBase": "https://catalog.fresnostate.edu",
+        "startUrl": "https://catalog.fresnostate.edu/content.php?catoid=5&navoid=193",
+        "selectors": {
+            "code": lambda el: el.select_one("#course_preview_title").text.split(" - ")[
+                0
+            ],
+            "title": lambda el: el.select_one("#course_preview_title").text.split(" - ")[
+                1
+            ],
+            "description": lambda el: el.select_one(
+                "#course_preview_title + hr"
+            ).nextSibling,
+        },
+    },
 }
