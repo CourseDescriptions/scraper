@@ -2,9 +2,11 @@ import gzip
 import logging
 import re
 from pathlib import Path
+from typing import Callable
 from urllib import parse
 
 import requests
+from bs4 import Tag
 
 from scraper.config import CACHE_DIR
 
@@ -41,3 +43,14 @@ def fetch(url: str) -> str:
         _fh.write(response.text)
 
     return response.text
+
+
+def get_field_from_soup(el: Tag, op: str | Callable) -> str:
+    if isinstance(op, str):
+        elem = el.select_one(op)
+        if elem is None:
+            # logging.warning(f"Could not find '{field_name}' in '{url}'")
+            raise ValueError
+        return normalize_text(elem.text)
+
+    return normalize_text(op(el))

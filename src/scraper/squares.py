@@ -1,10 +1,9 @@
-import logging
 from typing import Tuple
 
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 from rich import print
 
-from scraper.common import fetch, normalize_text, resolve_url
+from scraper.common import fetch, get_field_from_soup, resolve_url
 
 
 class SquaresScraper:
@@ -30,23 +29,13 @@ class SquaresScraper:
         html = fetch(url)
         soup = BeautifulSoup(html, "lxml")
 
-        def get_text(el: Tag, field_name: str) -> str:
-            op = self.config["selectors"].get(field_name)
-            if type(op) is str:
-                elem = el.select_one(op)
-                if elem is None:
-                    logging.warning(f"Could not find '{field_name}' in '{url}'")
-                    raise ValueError
-                return normalize_text(elem.text)
-
-            return normalize_text(op(el))
-
-        data = []
-        for el in soup.select(".courseblock"):
-            code = get_text(el, "code")
-            title = get_text(el, "title")
-            description = get_text(el, "description")
-            data.append({"code": code, "title": title, "description": description})
+        data = [
+            {
+                field: get_field_from_soup(el, self.config["selectors"].get(field))
+                for field in ["code", "title", "description"]
+            }
+            for el in soup.select(".courseblock")
+        ]
 
         return data
 

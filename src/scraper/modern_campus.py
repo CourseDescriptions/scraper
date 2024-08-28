@@ -1,10 +1,15 @@
 import logging
 from typing import Tuple
 
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 from rich import print
 
-from scraper.common import fetch, normalize_text, resolve_url
+from scraper.common import (
+    fetch,
+    get_field_from_soup,
+    normalize_text,
+    resolve_url,
+)
 
 
 class ModernCampusScraper:
@@ -18,21 +23,9 @@ class ModernCampusScraper:
         html = fetch(url)
         soup = BeautifulSoup(html, "lxml")
 
-        def get_text(el: Tag, field_name: str) -> str:
-            op = self.config["selectors"].get(field_name)
-            if type(op) is str:
-                elem = el.select_one(op)
-                if elem is None:
-                    logging.warning(f"Could not find '{field_name}' in '{url}'")
-                    raise ValueError
-                return normalize_text(elem.text)
-
-            return normalize_text(op(el))
-
         data = {
-            "code": get_text(soup, "code"),
-            "title": get_text(soup, "title"),
-            "description": get_text(soup, "description"),
+            field: get_field_from_soup(soup, self.config["selectors"].get(field))
+            for field in ["code", "title", "description"]
         }
 
         return data
