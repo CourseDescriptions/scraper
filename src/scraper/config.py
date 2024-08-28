@@ -1,5 +1,6 @@
 from pathlib import Path
 
+# relative to this config file
 CACHE_DIR = Path(__file__).parent.parent.parent / "cache"
 
 SITES = {

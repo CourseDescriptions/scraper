@@ -15,3 +15,10 @@ dependencies = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 89
+select = ["B","C","E","F","T","W","B9","I"]
+
+[tool.ruff.isort]
+known-first-party = ["scraper"]
