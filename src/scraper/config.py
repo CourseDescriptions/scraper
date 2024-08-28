@@ -25,4 +25,19 @@ SITES = {
             "description": lambda el: el.select_one(".courseblockextra em").nextSibling,
         },
     },
+    "UC_Irvine": {
+        "name": "UC Irvine",
+        "type": "squares",
+        "urlBase": "https://catalogue.uci.edu",
+        "subjectCodesUrl": "https://catalogue.uci.edu/allcourses/",
+        "selectors": {
+            "code": lambda el: el.select_one(".courseblocktitle strong").text.split(
+                ".  "
+            )[0],
+            "title": lambda el: el.select_one(".courseblocktitle strong").text.split(
+                ".  "
+            )[1],
+            "description": ".courseblockdesc p:first-child",
+        },
+    },
 }
