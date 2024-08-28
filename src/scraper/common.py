@@ -1,3 +1,4 @@
+import gzip
 import logging
 import re
 from pathlib import Path
@@ -17,21 +18,21 @@ def normalize_text(text: str) -> str:
 def get_cache_path_for_url(url: str) -> Path:
     """Get the cache path for the given url."""
     quoted = parse.quote(url, "")
-    return CACHE_DIR / f"{quoted}.html"
+    return CACHE_DIR / f"{quoted}.html.gz"
 
 
 def fetch(url: str) -> str:
     """Fetch the contents of the given URL."""
     cache_path = get_cache_path_for_url(url)
     if cache_path.exists():
-        with cache_path.open() as _fh:
+        with gzip.open(cache_path, "rt") as _fh:
             return _fh.read()
 
     logging.info(f"Fetching {url}...")
     response = requests.get(url)
     response.raise_for_status()
 
-    with cache_path.open("w") as _fh:
+    with gzip.open(cache_path, "wt") as _fh:
         _fh.write(response.text)
 
     return response.text
