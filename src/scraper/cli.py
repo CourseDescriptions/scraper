@@ -11,7 +11,7 @@ from rich import print
 from rich.console import Console
 from rich.logging import RichHandler
 
-from scraper.config import SITES
+from scraper.config import CACHE_DIR, SITES
 from scraper.modern_campus import ModernCampusScraper
 from scraper.squares import SquaresScraper
 
@@ -52,6 +52,12 @@ def get(
         help="The ID of the site to scrape (e.g. UC_Davis, UC_Berkeley)"
     ),
 ):
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        logging.fatal("Could not create cache directory.")
+        raise typer.Abort() from None
+
     if site_id not in SITES:
         logging.fatal('Configuration for site "%s" not found.', site_id)
         raise typer.Abort()
