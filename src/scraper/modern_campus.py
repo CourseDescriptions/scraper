@@ -16,7 +16,7 @@ class ModernCampusScraper:
     def extract_data_from_course_page_url(self, url: str) -> dict:
         """Extract information from the given course page."""
         html = fetch(url)
-        soup = BeautifulSoup(html, "html.parser")
+        soup = BeautifulSoup(html, "lxml")
 
         def get_text(el: Tag, field_name: str) -> str:
             op = self.config["selectors"].get(field_name)
@@ -54,7 +54,7 @@ class ModernCampusScraper:
         # """Get course descriptions for all subject codes."""
 
         html = fetch(self.config["startUrl"])
-        soup = BeautifulSoup(html, "html.parser")
+        soup = BeautifulSoup(html, "lxml")
         current_page = soup.select_one("[aria-current=page]").text
         last_page = soup.select_one("[aria-current=page] ~ a:last-child").text
 
@@ -64,7 +64,7 @@ class ModernCampusScraper:
 
         for i in range(2, int(last_page) + 1):
             html = fetch(self.config["startUrl"] + f"&filter[cpage]={i}")
-            soup = BeautifulSoup(html, "html.parser")
+            soup = BeautifulSoup(html, "lxml")
             current_page = soup.select_one("[aria-current=page]").text
             assert current_page == str(i)
 

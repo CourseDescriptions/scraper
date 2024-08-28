@@ -16,7 +16,7 @@ class SquaresScraper:
     def extract_subject_code_pages(self) -> list[Tuple[str, str]]:
         """Extract a list of subject code pages from the given HTML."""
         html = fetch(self.config["subjectCodesUrl"])
-        soup = BeautifulSoup(html, "html.parser")
+        soup = BeautifulSoup(html, "lxml")
         return [
             (
                 el.text,
@@ -28,7 +28,7 @@ class SquaresScraper:
     def extract_from_subject_code_page_url(self, url: str) -> list[dict]:
         """Extract information from the given subject code page."""
         html = fetch(url)
-        soup = BeautifulSoup(html, "html.parser")
+        soup = BeautifulSoup(html, "lxml")
 
         def get_text(el: Tag, field_name: str) -> str:
             op = self.config["selectors"].get(field_name)
