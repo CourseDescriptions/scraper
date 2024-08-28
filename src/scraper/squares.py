@@ -39,11 +39,15 @@ class SquaresScraper:
 
         return data
 
-    def get(self) -> None:
+    def get(self) -> list[dict]:
         """Get course descriptions for all subject codes."""
         # !! FIXME: Currently hard-coded to only the first subject code
         subject_code_pages = self.extract_subject_code_pages()
 
-        for _title, url in subject_code_pages[:1]:
-            data = self.extract_from_subject_code_page_url(url)
-            print(data)
+        data = [
+            course_data
+            for _title, url in subject_code_pages[:1]
+            for course_data in self.extract_from_subject_code_page_url(url)
+        ]
+
+        return data

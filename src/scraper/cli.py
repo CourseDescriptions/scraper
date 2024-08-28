@@ -4,7 +4,9 @@
 
 __version__ = "0.1"
 
+import json
 import logging
+import sys
 
 import typer
 from rich import print
@@ -15,7 +17,9 @@ from scraper.config import CACHE_DIR, SITES
 from scraper.modern_campus import ModernCampusScraper
 from scraper.squares import SquaresScraper
 
-cli = typer.Typer(add_completion=False, no_args_is_help=True)
+cli = typer.Typer(
+    add_completion=False, no_args_is_help=True, pretty_exceptions_show_locals=False
+)
 
 
 @cli.callback()
@@ -72,7 +76,9 @@ def get(
         logging.fatal('Scraper type "%s" not supported.', site_config["type"])
         raise typer.Abort()
 
-    scraper.get()
+    data = scraper.get()
+
+    json.dump(data, indent=2, fp=sys.stdout)
 
 
 if __name__ == "__main__":

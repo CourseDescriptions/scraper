@@ -43,7 +43,7 @@ class ModernCampusScraper:
             for el in soup.select("a[href^='preview_course_nopop.php']")
         ]
 
-    def get(self) -> None:
+    def get(self) -> list[dict]:
         # """Get course descriptions for all subject codes."""
 
         html = fetch(self.config["startUrl"])
@@ -64,9 +64,9 @@ class ModernCampusScraper:
             urls += self.extract_urls_from_catalog_page_soup(soup)
 
         logging.debug("%d course pages found", len(urls))
-        # print(urls)
-        # print(len(urls))
 
-        for _title, url in urls[:2]:
-            data = self.extract_data_from_course_page_url(url)
-            print(data)
+        urls = [(title, url) for title, url in urls if title.startswith("ACCT")]
+
+        data = [self.extract_data_from_course_page_url(url) for _title, url in urls]
+
+        return data
