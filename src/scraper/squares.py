@@ -4,7 +4,7 @@ from typing import Tuple
 from bs4 import BeautifulSoup, Tag
 from rich import print
 
-from scraper.common import fetch, normalize_text
+from scraper.common import fetch, normalize_text, resolve_url
 
 
 class SquaresScraper:
@@ -20,9 +20,7 @@ class SquaresScraper:
         return [
             (
                 el.text,
-                el.attrs["href"]
-                if el.attrs["href"].startswith("http")
-                else self.config["urlBase"] + el.attrs["href"],
+                resolve_url(el.attrs["href"], self.config["subjectCodesUrl"]),
             )
             for el in soup.select(".letternav-head + ul li a")
         ]

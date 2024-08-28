@@ -15,6 +15,11 @@ def normalize_text(text: str) -> str:
     return re.sub(r"\s+", " ", text.strip())
 
 
+def resolve_url(url: str, base_url: str) -> str:
+    """Resolve the given URL against the given base URL."""
+    return parse.urljoin(base_url, url)
+
+
 def get_cache_path_for_url(url: str) -> Path:
     """Get the cache path for the given url."""
     quoted = parse.quote(url, "")
