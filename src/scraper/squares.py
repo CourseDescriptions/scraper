@@ -1,7 +1,7 @@
 import logging
 from typing import Tuple
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from rich import print
 
 from scraper.common import fetch, normalize_text
@@ -27,12 +27,12 @@ class SquaresScraper:
             for el in soup.select(".letternav-head + ul li a")
         ]
 
-    def extract_from_subject_code_page(self, url: str) -> list[dict]:
+    def extract_from_subject_code_page_url(self, url: str) -> list[dict]:
         """Extract information from the given subject code page."""
         html = fetch(url)
         soup = BeautifulSoup(html, "html.parser")
 
-        def get_text(el: BeautifulSoup, field_name: str) -> str:
+        def get_text(el: Tag, field_name: str) -> str:
             op = self.config["selectors"].get(field_name)
             if type(op) is str:
                 elem = el.select_one(op)
@@ -58,5 +58,5 @@ class SquaresScraper:
         subject_code_pages = self.extract_subject_code_pages()
 
         for _title, url in subject_code_pages[:1]:
-            data = self.extract_from_subject_code_page(url)
+            data = self.extract_from_subject_code_page_url(url)
             print(data)
