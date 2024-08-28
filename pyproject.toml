@@ -1,0 +1,17 @@
+[project]
+name = "scraper"
+version = "0.1.0"
+description = "Course Descriptions Scraper(s)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bs4>=0.0.2",
+    "requests>=2.32.3",
+    "rich>=13.8.0",
+    "ruff>=0.6.2",
+    "typer>=0.12.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
