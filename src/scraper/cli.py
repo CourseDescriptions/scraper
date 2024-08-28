@@ -41,6 +41,12 @@ def common_options(
 
 
 @cli.command()
+def list_ids():
+    for site_id in SITES:
+        print(site_id)
+
+
+@cli.command()
 def get(
     site_id: str = typer.Argument(
         help="The ID of the site to scrape (e.g. UC_Davis, UC_Berkeley)"
