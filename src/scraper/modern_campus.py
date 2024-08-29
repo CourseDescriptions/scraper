@@ -24,8 +24,11 @@ class ModernCampusScraper:
         soup = BeautifulSoup(html, "lxml")
 
         data = {
-            field: get_field_from_soup(soup, self.config["selectors"].get(field))
-            for field in ["code", "title", "description"]
+            **{
+                field: get_field_from_soup(soup, self.config["selectors"].get(field))
+                for field in ["code", "title", "description"]
+            },
+            **{"url": url},
         }
 
         return data

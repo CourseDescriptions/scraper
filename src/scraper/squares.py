@@ -31,8 +31,11 @@ class SquaresScraper:
 
         data = [
             {
-                field: get_field_from_soup(el, self.config["selectors"].get(field))
-                for field in ["code", "title", "description"]
+                **{
+                    field: get_field_from_soup(el, self.config["selectors"].get(field))
+                    for field in ["code", "title", "description"]
+                },
+                **{"url": url},
             }
             for el in soup.select(".courseblock")
         ]
