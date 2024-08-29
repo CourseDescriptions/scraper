@@ -13,6 +13,8 @@ from scraper.config import CACHE_DIR
 
 def normalize_text(text: str) -> str:
     """Normalize the given text."""
+    if text is None:
+        return ""
     # Note: amongst other things, this replaces non-breaking spaces
     return re.sub(r"\s+", " ", text.strip())
 
