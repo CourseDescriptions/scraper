@@ -26,8 +26,11 @@ def resolve_url(url: str, base_url: str) -> str:
 
 def get_cache_path_for_url(url: str) -> Path:
     """Get the cache path for the given url."""
+    host = parse.urlparse(url).hostname
+    assert host is not None
+    Path(CACHE_DIR / host).mkdir(parents=True, exist_ok=True)
     quoted = parse.quote(url, "")
-    return CACHE_DIR / f"{quoted}.html.gz"
+    return CACHE_DIR / host / f"{quoted}.html.gz"
 
 
 def fetch(url: str) -> str:
