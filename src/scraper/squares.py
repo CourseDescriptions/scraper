@@ -1,7 +1,6 @@
 from typing import Tuple
 
 from bs4 import BeautifulSoup
-from rich import print
 
 from scraper.common import fetch, get_field_from_soup, resolve_url
 
@@ -44,12 +43,11 @@ class SquaresScraper:
 
     def get(self) -> list[dict]:
         """Get course descriptions for all subject codes."""
-        # !! FIXME: Currently hard-coded to only the first subject code
         subject_code_pages = self.extract_subject_code_pages()
 
         data = [
             course_data
-            for _title, url in subject_code_pages[:1]
+            for _title, url in subject_code_pages
             for course_data in self.extract_from_subject_code_page_url(url)
         ]
 
