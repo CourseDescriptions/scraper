@@ -11,7 +11,14 @@ SITES = {
         "selectors": {
             "code": ".courseblocktitle .code",
             "title": ".courseblocktitle .title",
-            "description": lambda el: el.select_one(".descshow br").nextSibling,
+            # Text content from the .descshow element minus the part before the first
+            #  <br/> element plus the text from the .deschide element if it exists
+            "description": lambda el: (
+                descshow := el.select_one(".descshow"),
+                descshow.contents[0].extract(),
+                descshow.text,
+            )[-1]
+            + getattr(el.select_one(".deschide"), "text", ""),
         },
     },
     "UC_Davis": {
