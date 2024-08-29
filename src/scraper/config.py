@@ -28,7 +28,13 @@ SITES = {
         "selectors": {
             "code": ".detail-code b",
             "title": lambda el: el.select_one(".detail-title b").text.lstrip("— "),
-            "description": lambda el: el.select_one(".courseblockextra em").nextSibling,
+            # Text content from the .courseblockextra element minus the part before
+            #  the first <br/> element
+            "description": lambda el: (
+                courseblockextra := el.select_one(".courseblockextra"),
+                courseblockextra.contents[0].extract(),
+                courseblockextra.text,
+            )[-1],
         },
     },
     "UC_Irvine": {
