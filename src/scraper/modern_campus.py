@@ -2,7 +2,6 @@ import logging
 from typing import Tuple
 
 from bs4 import BeautifulSoup
-from rich import print
 
 from scraper.common import (
     fetch,
@@ -10,6 +9,34 @@ from scraper.common import (
     normalize_text,
     resolve_url,
 )
+
+
+def extract(el):
+    start = el.select_one("#course_preview_title ~ hr")
+
+    content = []
+
+    # The Modern Campus sites have unstructured free-form HTML for the course
+    #  descriptions.  This heuristic grabs everything from the <hr> under the
+    #  title (which *does* seem to be consistent) up until either the next <hr>
+    #  (which consistently indicates the end of the block) or the first <strong>
+    #  element, which generally seems to introduce the first of (potentially) a
+    #  bunch of additional metadata which is not part of the description itself.
+    #  Other tags are passed over.
+    # This is far from perfect, but it will have to do for now.
+    for sibling in start.next_siblings:
+        if sibling.name == "hr":
+            break
+
+        if sibling.name == "strong":
+            break
+
+        if sibling.name:
+            continue
+
+        content.append(sibling)
+
+    return normalize_text(" ".join(content))
 
 
 class ModernCampusScraper:
@@ -24,11 +51,10 @@ class ModernCampusScraper:
         soup = BeautifulSoup(html, "lxml")
 
         data = {
-            **{
-                field: get_field_from_soup(soup, self.config["selectors"].get(field))
-                for field in ["code", "title", "description"]
-            },
-            **{"url": url},
+            "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
+            "title": get_field_from_soup(soup, self.config["selectors"].get("title")),
+            "description": extract(soup),
+            "url": url,
         }
 
         return data
@@ -38,6 +64,8 @@ class ModernCampusScraper:
     ) -> list[Tuple[str, str]]:
         # consider using /ajax/preview_course.php?catoid=35&coid=143860&show pages
         #   instead of /preview_course_nopop.php?catoid=35&coid=143860 ??
+        # nb. these are not the same, and the "preview_course" versions look less
+        #     regular and harder to parse (at first glance, at least).
         return [
             (
                 normalize_text(el.text),
@@ -47,12 +75,17 @@ class ModernCampusScraper:
         ]
 
     def get(self) -> list[dict]:
-        # """Get course descriptions for all subject codes."""
+        """Get course descriptions for all subject codes."""
 
         html = fetch(self.config["startUrl"])
         soup = BeautifulSoup(html, "lxml")
-        current_page = soup.select_one("[aria-current=page]").text
-        last_page = soup.select_one("[aria-current=page] ~ a:last-child").text
+        current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
+        last_page = getattr(
+            soup.select_one("[aria-current=page] ~ a:last-child"), "text", None
+        )
+
+        if current_page is None or last_page is None:
+            raise Exception("Could not determine number of catalog pages -- aborting")
 
         logging.debug("%s catalog pages found", last_page)
 
@@ -61,14 +94,12 @@ class ModernCampusScraper:
         for i in range(2, int(last_page) + 1):
             html = fetch(self.config["startUrl"] + f"&filter[cpage]={i}")
             soup = BeautifulSoup(html, "lxml")
-            current_page = soup.select_one("[aria-current=page]").text
+            current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
             assert current_page == str(i)
 
             urls += self.extract_urls_from_catalog_page_soup(soup)
 
         logging.debug("%d course pages found", len(urls))
-
-        urls = [(title, url) for title, url in urls if title.startswith("ACCT")]
 
         data = [self.extract_data_from_course_page_url(url) for _title, url in urls]
 

@@ -63,9 +63,6 @@ SITES = {
             "title": lambda el: el.select_one("#course_preview_title").text.split(" - ")[
                 1
             ],
-            "description": lambda el: el.select_one(
-                "#course_preview_title ~ br"
-            ).nextSibling,
         },
     },
     "Fresno_State": {
@@ -80,9 +77,6 @@ SITES = {
             "title": lambda el: el.select_one("#course_preview_title").text.split(" - ")[
                 1
             ],
-            "description": lambda el: el.select_one(
-                "#course_preview_title + hr"
-            ).nextSibling,
         },
     },
 }
