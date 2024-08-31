@@ -55,6 +55,16 @@ SITES = {
         "name": "UCLA",
         "type": "ucla",
     },
+    "UC_San_Francisco": {
+        "name": "UC San Francisco",
+        "type": "courseleaf",
+        "subjectCodesUrl": "https://catalog.ucsf.edu/course-catalog/",
+        "selectors": {
+            "code": ".detail-code",
+            "title": ".detail-title",
+            "description": ".courseblockextra:not(.noindent)",
+        },
+    },
     "CSU_East_Bay": {
         "name": "CSU East Bay",
         "type": "moderncampus",
