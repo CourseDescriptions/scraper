@@ -68,8 +68,7 @@ def get_field_from_soup(el: Tag, op: str | Callable) -> str:
     if isinstance(op, str):
         elem = el.select_one(op)
         if elem is None:
-            # logging.warning(f"Could not find '{field_name}' in '{url}'")
-            raise ValueError
+            raise ValueError(f"Could not find '{op}' in '{el}'")
         return normalize_text(elem.text)
 
     return normalize_text(op(el))
