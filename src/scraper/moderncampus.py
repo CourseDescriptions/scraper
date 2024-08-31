@@ -71,7 +71,7 @@ class ModernCampusScraper:
             for el in soup.select("a[href^='preview_course_nopop.php']")
         ]
 
-    def get(self) -> list[dict]:
+    def get(self, limit: int | None = None) -> list[dict]:
         """Get course descriptions for all subject codes."""
 
         soup = fetch_soup(self.config["startUrl"])

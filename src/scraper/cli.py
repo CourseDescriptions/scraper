@@ -56,6 +56,14 @@ def get(
     site_id: str = typer.Argument(
         help="The ID of the site to scrape (e.g. UC_Davis, UC_Berkeley)"
     ),
+    limit: int | None = typer.Option(
+        None,
+        "--limit",
+        "-l",
+        help="""
+        Limit the number of results (for testing -- exact meaning is dependent on scraper backend)
+        """.strip(),
+    ),
 ):
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -79,7 +87,7 @@ def get(
         logging.fatal('Scraper type "%s" not supported.', site_config["type"])
         raise typer.Abort()
 
-    data = scraper.get()
+    data = scraper.get(limit)
 
     json.dump(data, indent=2, fp=sys.stdout)
 

@@ -28,7 +28,7 @@ class UclaScraper:
             for course in course_data_json
         ]
 
-    def get(self) -> list[dict]:
+    def get(self, limit: int | None = None) -> list[dict]:
         """Get course descriptions for all subject codes."""
 
         subject_codes_json = fetch_json(f"{API_BASE}/getallcourses")

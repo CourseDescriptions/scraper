@@ -37,9 +37,12 @@ class CourseLeafScraper:
 
         return data
 
-    def get(self) -> list[dict]:
+    def get(self, limit: int | None = None) -> list[dict]:
         """Get course descriptions for all subject codes."""
         subject_code_pages = self.extract_subject_code_pages()
+
+        if limit is not None:
+            subject_code_pages = subject_code_pages[:limit]
 
         data = [
             course_data
