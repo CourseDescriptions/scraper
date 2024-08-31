@@ -14,8 +14,8 @@ from rich.console import Console
 from rich.logging import RichHandler
 
 from scraper.config import CACHE_DIR, SITES
-from scraper.modern_campus import ModernCampusScraper
-from scraper.squares import SquaresScraper
+from scraper.moderncampus import ModernCampusScraper
+from scraper.courseleaf import CourseLeafScraper
 from scraper.ucla import UclaScraper
 
 cli = typer.Typer(
@@ -69,9 +69,9 @@ def get(
 
     site_config = SITES[site_id]
 
-    if site_config["type"] == "squares":
-        scraper = SquaresScraper(site_config)
-    elif site_config["type"] == "modern_campus":
+    if site_config["type"] == "courseleaf":
+        scraper = CourseLeafScraper(site_config)
+    elif site_config["type"] == "moderncampus":
         scraper = ModernCampusScraper(site_config)
     elif site_config["type"] == "ucla":
         scraper = UclaScraper(site_config)

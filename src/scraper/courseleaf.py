@@ -3,7 +3,7 @@ from typing import Tuple
 from scraper.common import fetch_soup, get_field_from_soup, resolve_url
 
 
-class SquaresScraper:
+class CourseLeafScraper:
     """Course Descriptions Scraper for "squares"-type sites."""
 
     def __init__(self, site_config: dict) -> None:
