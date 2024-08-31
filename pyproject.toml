@@ -23,3 +23,8 @@ select = ["B","C","E","F","T","W","B9","I"]
 
 [tool.ruff.isort]
 known-first-party = ["scraper"]
+
+[tool.uv]
+dev-dependencies = [
+    "ipython>=8.26.0",
+]
