@@ -16,6 +16,7 @@ from rich.logging import RichHandler
 from scraper.config import CACHE_DIR, SITES
 from scraper.modern_campus import ModernCampusScraper
 from scraper.squares import SquaresScraper
+from scraper.ucla import UclaScraper
 
 cli = typer.Typer(
     add_completion=False, no_args_is_help=True, pretty_exceptions_show_locals=False
@@ -72,6 +73,8 @@ def get(
         scraper = SquaresScraper(site_config)
     elif site_config["type"] == "modern_campus":
         scraper = ModernCampusScraper(site_config)
+    elif site_config["type"] == "ucla":
+        scraper = UclaScraper(site_config)
     else:
         logging.fatal('Scraper type "%s" not supported.', site_config["type"])
         raise typer.Abort()

@@ -51,6 +51,10 @@ SITES = {
             "description": ".courseblockdesc p:first-child",
         },
     },
+    "UCLA": {
+        "name": "UCLA",
+        "type": "ucla",
+    },
     "CSU_East_Bay": {
         "name": "CSU East Bay",
         "type": "modern_campus",
