@@ -1,4 +1,5 @@
 import gzip
+import json
 import logging
 import re
 from pathlib import Path
@@ -6,7 +7,7 @@ from typing import Callable
 from urllib import parse
 
 import requests
-from bs4 import Tag
+from bs4 import BeautifulSoup, Tag
 
 from scraper.config import CACHE_DIR
 
@@ -24,18 +25,17 @@ def resolve_url(url: str, base_url: str) -> str:
     return parse.urljoin(base_url, url)
 
 
-def get_cache_path_for_url(url: str) -> Path:
+def get_cache_path_for_url(url: str, ext: str = "html") -> Path:
     """Get the cache path for the given url."""
     host = parse.urlparse(url).hostname
     assert host is not None
     Path(CACHE_DIR / host).mkdir(parents=True, exist_ok=True)
     quoted = parse.quote(url, "")
-    return CACHE_DIR / host / f"{quoted}.html.gz"
+    return CACHE_DIR / host / f"{quoted}.{ext}.gz"
 
 
-def fetch(url: str) -> str:
+def _fetch(url: str, cache_path: Path) -> str:
     """Fetch the contents of the given URL."""
-    cache_path = get_cache_path_for_url(url)
     if cache_path.exists():
         with gzip.open(cache_path, "rt") as _fh:
             return _fh.read()
@@ -48,6 +48,20 @@ def fetch(url: str) -> str:
         _fh.write(response.text)
 
     return response.text
+
+
+def fetch_soup(url: str) -> Tag:
+    """Fetch the contents of the given URL and parse as HTML."""
+    cache_path = get_cache_path_for_url(url, ext="html")
+    response_text = _fetch(url, cache_path)
+    return BeautifulSoup(response_text, "lxml")
+
+
+def fetch_json(url: str) -> dict:
+    """Fetch the contents of the given URL and parse as JSON."""
+    cache_path = get_cache_path_for_url(url, ext="json")
+    response_text = _fetch(url, cache_path)
+    return json.loads(response_text)
 
 
 def get_field_from_soup(el: Tag, op: str | Callable) -> str:

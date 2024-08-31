@@ -1,8 +1,6 @@
 from typing import Tuple
 
-from bs4 import BeautifulSoup
-
-from scraper.common import fetch, get_field_from_soup, resolve_url
+from scraper.common import fetch_soup, get_field_from_soup, resolve_url
 
 
 class SquaresScraper:
@@ -13,8 +11,7 @@ class SquaresScraper:
 
     def extract_subject_code_pages(self) -> list[Tuple[str, str]]:
         """Extract a list of subject code pages from the given HTML."""
-        html = fetch(self.config["subjectCodesUrl"])
-        soup = BeautifulSoup(html, "lxml")
+        soup = fetch_soup(self.config["subjectCodesUrl"])
         return [
             (
                 el.text,
@@ -25,8 +22,7 @@ class SquaresScraper:
 
     def extract_from_subject_code_page_url(self, url: str) -> list[dict]:
         """Extract information from the given subject code page."""
-        html = fetch(url)
-        soup = BeautifulSoup(html, "lxml")
+        soup = fetch_soup(url)
 
         data = [
             {

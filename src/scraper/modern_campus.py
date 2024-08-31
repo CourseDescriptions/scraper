@@ -1,10 +1,10 @@
 import logging
 from typing import Tuple
 
-from bs4 import BeautifulSoup
+from bs4 import Tag
 
 from scraper.common import (
-    fetch,
+    fetch_soup,
     get_field_from_soup,
     normalize_text,
     resolve_url,
@@ -47,8 +47,7 @@ class ModernCampusScraper:
 
     def extract_data_from_course_page_url(self, url: str) -> dict:
         """Extract information from the given course page."""
-        html = fetch(url)
-        soup = BeautifulSoup(html, "lxml")
+        soup = fetch_soup(url)
 
         data = {
             "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
@@ -59,9 +58,7 @@ class ModernCampusScraper:
 
         return data
 
-    def extract_urls_from_catalog_page_soup(
-        self, soup: BeautifulSoup
-    ) -> list[Tuple[str, str]]:
+    def extract_urls_from_catalog_page_soup(self, soup: Tag) -> list[Tuple[str, str]]:
         # consider using /ajax/preview_course.php?catoid=35&coid=143860&show pages
         #   instead of /preview_course_nopop.php?catoid=35&coid=143860 ??
         # nb. these are not the same, and the "preview_course" versions look less
@@ -77,8 +74,7 @@ class ModernCampusScraper:
     def get(self) -> list[dict]:
         """Get course descriptions for all subject codes."""
 
-        html = fetch(self.config["startUrl"])
-        soup = BeautifulSoup(html, "lxml")
+        soup = fetch_soup(self.config["startUrl"])
         current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
         last_page = getattr(
             soup.select_one("[aria-current=page] ~ a:last-child"), "text", None
@@ -92,8 +88,7 @@ class ModernCampusScraper:
         urls = self.extract_urls_from_catalog_page_soup(soup)
 
         for i in range(2, int(last_page) + 1):
-            html = fetch(self.config["startUrl"] + f"&filter[cpage]={i}")
-            soup = BeautifulSoup(html, "lxml")
+            soup = fetch_soup(self.config["startUrl"] + f"&filter[cpage]={i}")
             current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
             assert current_page == str(i)
 
