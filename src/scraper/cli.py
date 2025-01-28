@@ -7,6 +7,8 @@ __version__ = "0.1"
 import json
 import logging
 import sys
+# import os
+# from datetime import datetime
 
 import typer
 from rich import print
@@ -45,12 +47,14 @@ def common_options(
     )
 
 
+# list all schools with configs
 @cli.command()
 def list_ids():
     for site_id in SITES:
         print(site_id)
 
 
+# command to scrape data from a specific school
 @cli.command()
 def get(
     site_id: str = typer.Argument(
@@ -65,6 +69,7 @@ def get(
         """.strip(),
     ),
 ):
+    # make a cache
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
     except OSError:
@@ -77,6 +82,7 @@ def get(
 
     site_config = SITES[site_id]
 
+    # use specified scraper type
     if site_config["type"] == "courseleaf":
         scraper = CourseLeafScraper(site_config)
     elif site_config["type"] == "moderncampus":
@@ -87,9 +93,18 @@ def get(
         logging.fatal('Scraper type "%s" not supported.', site_config["type"])
         raise typer.Abort()
 
+    # scrape the data
     data = scraper.get(limit)
 
     json.dump(data, indent=2, fp=sys.stdout)
+
+    # try:
+    #     os.mkdir("data")
+    # except FileExistsError:
+    #     pass
+    # now = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
+    # with open("data/" + site_id + "_" + now + ".json", "w+") as f:
+    #     json.dump(data, f)
 
 
 if __name__ == "__main__":

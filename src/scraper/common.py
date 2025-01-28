@@ -1,3 +1,5 @@
+"""Useful functions for all the scraper types"""
+
 import gzip
 import json
 import logging
@@ -31,19 +33,22 @@ def get_cache_path_for_url(url: str, ext: str = "html") -> Path:
     assert host is not None
     Path(CACHE_DIR / host).mkdir(parents=True, exist_ok=True)
     quoted = parse.quote(url, "")
-    return CACHE_DIR / host / f"{quoted}.{ext}.gz"
+    return CACHE_DIR / host / f"{quoted}.{ext}.gz" # / operator concatenates paths
 
 
 def _fetch(url: str, cache_path: Path) -> str:
     """Fetch the contents of the given URL."""
+    # if course is already in cache, return it
     if cache_path.exists():
         with gzip.open(cache_path, "rt") as _fh:
             return _fh.read()
 
+    # fetch url
     logging.info(f"Fetching {url}...")
     response = requests.get(url)
-    response.raise_for_status()
+    response.raise_for_status() # check for http error
 
+    # compress text and write to cache
     with gzip.open(cache_path, "wt") as _fh:
         _fh.write(response.text)
 
@@ -65,10 +70,14 @@ def fetch_json(url: str) -> dict:
 
 
 def get_field_from_soup(el: Tag, op: str | Callable) -> str:
+    """Extract normalized text from element based on selector str or function"""
+    # if op is a str, use it as a selector str
     if isinstance(op, str):
         elem = el.select_one(op)
+        # error if couldn't find anything
         if elem is None:
             raise ValueError(f"Could not find '{op}' in '{el}'")
         return normalize_text(elem.text)
 
+    # if op is a callable, call it and pass the element
     return normalize_text(op(el))
