@@ -7,8 +7,8 @@ __version__ = "0.1"
 import json
 import logging
 import sys
-# import os
-# from datetime import datetime
+import os
+from datetime import datetime
 
 import typer
 from rich import print
@@ -98,13 +98,13 @@ def get(
 
     json.dump(data, indent=2, fp=sys.stdout)
 
-    # try:
-    #     os.mkdir("data")
-    # except FileExistsError:
-    #     pass
-    # now = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
-    # with open("data/" + site_id + "_" + now + ".json", "w+") as f:
-    #     json.dump(data, f)
+    try:
+        os.mkdir("data")
+    except FileExistsError:
+        pass
+    now = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
+    with open("data/" + site_id + "_" + now + ".json", "w+") as f:
+        json.dump(data, f)
 
 
 if __name__ == "__main__":
