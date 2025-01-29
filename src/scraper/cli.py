@@ -76,6 +76,7 @@ def get(
         logging.fatal("Could not create cache directory.")
         raise typer.Abort() from None
 
+    # error if we don't have a config for this site
     if site_id not in SITES:
         logging.fatal('Configuration for site "%s" not found.', site_id)
         raise typer.Abort()
@@ -96,12 +97,15 @@ def get(
     # scrape the data
     data = scraper.get(limit)
 
+    # dump the data to the console
     json.dump(data, indent=2, fp=sys.stdout)
 
+    # make a dir to dump jsons to
     try:
         os.mkdir("data")
     except FileExistsError:
         pass
+    # dump the json, prepend current time of scraping
     now = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     with open("data/" + site_id + "_" + now + ".json", "w+") as f:
         json.dump(data, f)
