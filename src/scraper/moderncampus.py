@@ -93,6 +93,10 @@ class ModernCampusScraper:
             assert current_page == str(i)
 
             urls += self.extract_urls_from_catalog_page_soup(soup)
+            
+            # if we've got more urls than limit, ignore
+            # TODO: actually constrain list to this len
+            if (limit and len(urls) >= limit): break
 
         logging.debug("%d course pages found", len(urls))
 
