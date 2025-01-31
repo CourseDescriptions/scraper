@@ -1,4 +1,4 @@
 def get_config(): return {
-"name": "UCLA",
-        "type": "ucla",
+  "name": "UCLA",
+  "type": "ucla"
 }
