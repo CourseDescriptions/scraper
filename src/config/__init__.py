@@ -17,5 +17,3 @@ for _, module_name, _ in pkgutil.iter_modules([package_path]):
 
             if config_data:
                 SITES[module_name] = config_data
-
-print("✅ SITES loaded in config:", SITES)  # Debugging to ensure SITES is set
