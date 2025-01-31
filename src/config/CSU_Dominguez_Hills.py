@@ -1,5 +1,4 @@
-{
-    "CSU_Dominguez_Hills": {
+def get_config(): return {
         "name": "CSU Dominguez Hills",
         "type": "courseleaf",
         "subjectCodesUrl": "https://catalog.csudh.edu/courses/",
@@ -14,4 +13,3 @@
             )[-1],
         },
     },
-}

@@ -1,5 +1,4 @@
-{ 
-  "CSU_Bakersfield" : {
+def get_config(): return {
     "name": "CSU Bakersfield",
     "type": "courseleaf",
     "subjectCodesUrl": "https://catalog.csub.edu/course-descriptions/",
@@ -12,4 +11,3 @@
         ),
     },
   }
-}
