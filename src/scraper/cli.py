@@ -7,6 +7,7 @@ __version__ = "0.1"
 import json
 import logging
 import sys
+from pathlib import Path
 import os
 from datetime import datetime
 
@@ -15,7 +16,9 @@ from rich import print
 from rich.console import Console
 from rich.logging import RichHandler
 
-from scraper.config import CACHE_DIR, SITES
+CACHE_DIR = Path(__file__).parent.parent.parent / "cache"
+from config import SITES
+
 from scraper.moderncampus import ModernCampusScraper
 from scraper.courseleaf import CourseLeafScraper
 from scraper.ucla import UclaScraper

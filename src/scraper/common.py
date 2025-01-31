@@ -11,7 +11,7 @@ from urllib import parse
 import requests
 from bs4 import BeautifulSoup, Tag
 
-from scraper.config import CACHE_DIR
+CACHE_DIR = Path(__file__).parent.parent.parent / "cache"
 
 
 def normalize_text(text: str) -> str:
