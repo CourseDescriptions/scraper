@@ -44,7 +44,7 @@ def _fetch(url: str, cache_path: Path) -> str:
     response = requests.get(url)
     response.raise_for_status()
 
-    with gzip.open(cache_path, "wt") as _fh:
+    with gzip.open(cache_path, "wt", encoding="utf-8") as _fh:
         _fh.write(response.text)
 
     return response.text
