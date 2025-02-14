@@ -40,8 +40,9 @@ def common_options(
         print(__version__)
         raise SystemExit
 
-    log_level = logging.DEBUG if verbose else logging.INFO
-    log_level = logging.CRITICAL if quiet else log_level
+    log_level = logging.INFO
+    if verbose: log_level = logging.DEBUG 
+    if quiet: log_level = logging.CRITICAL
     logging.basicConfig(
         level=log_level,
         format="%(message)s",
