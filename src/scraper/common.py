@@ -39,7 +39,7 @@ def get_cache_path_for_url(url: str, ext: str = "html") -> Path:
 def _fetch(url: str, cache_path: Path) -> str:
     """Fetch the contents of the given URL."""
     # if course is already in cache, return it
-    if cache_path.exists():
+    if cache_path and cache_path.exists():
         with gzip.open(cache_path, "rt") as _fh:
             return _fh.read()
 

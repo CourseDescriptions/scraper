@@ -72,8 +72,8 @@ def get(
         """.strip(),
     ),
     useCache: bool = typer.Option(
-        False,
-        "--no-cache",
+        True,
+        "--cache",
         "-c",
         help="""
         Ignore the cached webpages to force refetching from website

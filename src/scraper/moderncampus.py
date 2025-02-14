@@ -46,9 +46,9 @@ class ModernCampusScraper:
     def __init__(self, site_config: dict) -> None:
         self.config = site_config
 
-    def extract_data_from_course_page_url(self, url: str) -> dict:
+    def extract_data_from_course_page_url(self, url: str, useCache: bool = True) -> dict:
         """Extract information from the given course page."""
-        soup = fetch_soup(url, True)
+        soup = fetch_soup(url, useCache)
 
         data = {
             "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
