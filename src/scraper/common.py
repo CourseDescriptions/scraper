@@ -48,12 +48,9 @@ def _fetch(url: str, cache_path: Path) -> str:
     response = requests.get(url)
     response.raise_for_status() # check for http error
 
-<<<<<<< HEAD
-=======
     # do we want to normalize response.text before writing/returning?
     # https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize
     # compress text and write to cache
->>>>>>> a44b6fd1a8d7afdf5cbb7b805afbddc81b769fcd
     with gzip.open(cache_path, "wt", encoding="utf-8") as _fh:
         _fh.write(response.text)
 
