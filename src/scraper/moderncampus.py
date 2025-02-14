@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 from typing import Tuple
 
 from bs4 import Tag
@@ -47,7 +48,7 @@ class ModernCampusScraper:
 
     def extract_data_from_course_page_url(self, url: str) -> dict:
         """Extract information from the given course page."""
-        soup = fetch_soup(url)
+        soup = fetch_soup(url, True)
 
         data = {
             "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
@@ -71,10 +72,10 @@ class ModernCampusScraper:
             for el in soup.select("a[href^='preview_course_nopop.php']")
         ]
 
-    def get(self, limit: int | None = None) -> list[dict]:
+    def get(self, useCache: bool = True, limit: int | None = None) -> list[dict]:
         """Get course descriptions for all subject codes."""
 
-        soup = fetch_soup(self.config["startUrl"])
+        soup = fetch_soup(self.config["startUrl"], useCache)
         current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
         last_page = getattr(
             soup.select_one("[aria-current=page] ~ a:last-child"), "text", None
@@ -88,14 +89,31 @@ class ModernCampusScraper:
         urls = self.extract_urls_from_catalog_page_soup(soup)
 
         for i in range(2, int(last_page) + 1):
-            soup = fetch_soup(self.config["startUrl"] + f"&filter[cpage]={i}")
+            soup = fetch_soup(self.config["startUrl"] + f"&filter[cpage]={i}", useCache)
             current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
-            assert current_page == str(i)
+            print(self.config["startUrl"] + f"&filter[cpage]={i}")
+            # if this assert fails, may be because page did not load successfully (Fresno_State...)
+            try:
+                assert current_page == str(i)
+            except AssertionError as e:
+                # TODO: check if we are caching before trying to refetch
+                print(f"Though current_page would be {i}, was {current_page}")
+                print("Waiting 5s before refetch...")
+                sleep(5)
+                print("Trying to refetch")
+                soup = fetch_soup(self.config["startUrl"] + f"&filter[cpage]={i}", useCache)
+                current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
+                assert current_page == str(i)
 
             urls += self.extract_urls_from_catalog_page_soup(soup)
+            
+            # if we've got more urls than limit, ignore and cap urls
+            if (limit and len(urls) >= limit):
+                urls = urls[:limit]
+                break
 
         logging.debug("%d course pages found", len(urls))
 
-        data = [self.extract_data_from_course_page_url(url) for _title, url in urls]
+        data = [self.extract_data_from_course_page_url(url, useCache) for _title, url in urls]
 
         return data
