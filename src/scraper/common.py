@@ -36,15 +36,16 @@ def get_cache_path_for_url(url: str, ext: str = "html") -> Path:
     return CACHE_DIR / host / f"{quoted}.{ext}.gz" # / operator concatenates paths
 
 
-def _fetch(url: str, cache_path: Path) -> str:
+def _fetch(url: str, cache_path: Path, useCache: bool) -> str:
     """Fetch the contents of the given URL."""
     # if course is already in cache, return it
-    if cache_path and cache_path.exists():
+    if useCache and cache_path.exists():
+        logging.debug(f"Getting cached {url}")
         with gzip.open(cache_path, "rt") as _fh:
             return _fh.read()
 
     # fetch url
-    logging.info(f"Fetching {url}...")
+    logging.info(f"Fetching {url}")
     response = requests.get(url)
     response.raise_for_status() # check for http error
 
@@ -59,10 +60,8 @@ def _fetch(url: str, cache_path: Path) -> str:
 
 def fetch_soup(url: str, useCache: bool = True) -> Tag:
     """Fetch the contents of the given URL and parse as HTML."""
-    cache_path = None
-    if useCache:
-        cache_path = get_cache_path_for_url(url, ext="html")
-    response_text = _fetch(url, cache_path)
+    cache_path = get_cache_path_for_url(url, ext="html")
+    response_text = _fetch(url, cache_path, useCache)
     return BeautifulSoup(response_text, "lxml")
 
 
