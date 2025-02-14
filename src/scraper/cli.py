@@ -71,6 +71,15 @@ def get(
         Limit the number of results (for testing -- exact meaning is dependent on scraper backend)
         """.strip(),
     ),
+    useCache: bool = typer.Option(
+        False,
+        "--no-cache",
+        "-c",
+        help="""
+        Ignore the cached webpages to force refetching from website
+        """.strip(),
+
+    )
     # TODO: add an option to start from specific point in catalog
 ):
     # make a cache
@@ -99,7 +108,7 @@ def get(
         raise typer.Abort()
 
     # scrape the data
-    data = scraper.get(limit)
+    data = scraper.get(useCache, limit)
 
     # dump the data to the console
     json.dump(data, indent=2, fp=sys.stdout)

@@ -45,7 +45,7 @@ class CourseLeafScraper:
 
         return data
 
-    def get(self, limit: int | None = None) -> list[dict]:
+    def get(self, useCache: bool = True, limit: int | None = None) -> list[dict]:
         """Get course descriptions for all subject codes."""
         subject_code_pages = self.extract_subject_code_pages()
 

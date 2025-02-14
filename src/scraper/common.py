@@ -48,6 +48,8 @@ def _fetch(url: str, cache_path: Path) -> str:
     response = requests.get(url)
     response.raise_for_status() # check for http error
 
+    # do we want to normalize response.text before writing/returning?
+    # https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize
     # compress text and write to cache
     with gzip.open(cache_path, "wt", encoding="utf-8") as _fh:
         _fh.write(response.text)
@@ -55,9 +57,11 @@ def _fetch(url: str, cache_path: Path) -> str:
     return response.text
 
 
-def fetch_soup(url: str) -> Tag:
+def fetch_soup(url: str, useCache: bool = True) -> Tag:
     """Fetch the contents of the given URL and parse as HTML."""
-    cache_path = get_cache_path_for_url(url, ext="html")
+    cache_path = None
+    if useCache:
+        cache_path = get_cache_path_for_url(url, ext="html")
     response_text = _fetch(url, cache_path)
     return BeautifulSoup(response_text, "lxml")
 
