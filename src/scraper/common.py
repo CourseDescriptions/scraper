@@ -40,13 +40,14 @@ def _fetch(url: str, cache_path: Path, useCache: bool) -> str:
     """Fetch the contents of the given URL."""
     # if course is already in cache, return it
     if useCache and cache_path.exists():
-        logging.debug(f"Getting cached {url}")
-        with gzip.open(cache_path, "rt") as _fh:
+        logging.info(f"Getting cached {url}")
+        with gzip.open(cache_path, "rt", encoding="utf-8") as _fh:
             return _fh.read()
 
     # fetch url
-    logging.info(f"Fetching {url}")
+    logging.info(f"Requesting {url}")
     response = requests.get(url)
+    # TODO: try this and except to attempt waiting and refetching?
     response.raise_for_status() # check for http error
 
     # do we want to normalize response.text before writing/returning?

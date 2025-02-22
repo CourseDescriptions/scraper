@@ -4,8 +4,8 @@ def get_config(): return {
     "startUrl": "http://catalog.csulb.edu/content.php?catoid=10&navoid=1156",
     "selectors": {
         "code": lambda el: el.select_one("#course_preview_title")\
-        .text.split("Â -Â ")[0],
+        .text.split(" - ")[0],
         "title": lambda el: el.select_one("#course_preview_title")\
-        .text.split("Â -Â ")[1],
+        .text.split(" - ")[1],
     }
 }

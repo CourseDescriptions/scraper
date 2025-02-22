@@ -59,10 +59,14 @@ class ModernCampusScraper:
                 "url": url,
             }
         except Exception as e:
-            print(f"Encountered error while extracting data from {url}")
-            print(f"Soup.select_one: {soup.select_one("#course_preview_title")}")
-            # print(soup.select_one("#course_preview_title").text.split("Â -Â "))
-            raise Exception(e)
+            logging.error(f"Encountered error while extracting data from {url}\n Trying to refetch")
+            soup = fetch_soup(url, False)
+            data = {
+                "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
+                "title": get_field_from_soup(soup, self.config["selectors"].get("title")),
+                "description": extract(soup),
+                "url": url,
+            }
 
         return data
 
