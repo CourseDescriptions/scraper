@@ -111,7 +111,7 @@ class ModernCampusScraper:
                 print("Waiting 5s before refetch...")
                 sleep(5)
                 print("Trying to refetch")
-                soup = fetch_soup(self.config["startUrl"] + f"&filter[cpage]={i}", useCache)
+                soup = fetch_soup(self.config["startUrl"] + f"&filter[cpage]={i}", False)
                 current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
                 assert current_page == str(i)
 
