@@ -106,11 +106,8 @@ class ModernCampusScraper:
             try:
                 assert current_page == str(i)
             except AssertionError as e:
-                # TODO: check if we are caching before trying to refetch
-                print(f"Though current_page would be {i}, was {current_page}")
-                print("Waiting 5s before refetch...")
+                logging.error(f"Though current_page would be {i}, was {current_page}\nWaiting 5s and then refetching")
                 sleep(5)
-                print("Trying to refetch")
                 soup = fetch_soup(self.config["startUrl"] + f"&filter[cpage]={i}", False)
                 current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
                 assert current_page == str(i)
