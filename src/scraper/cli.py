@@ -72,14 +72,14 @@ def get(
         Limit the number of results (for testing -- exact meaning is dependent on scraper backend)
         """.strip(),
     ),
-    useCache: bool = typer.Option(
-        True,
-        "--cache",
-        "-c",
+    noCache: bool = typer.Option(
+        False,
+        "--no-cache",
+        "-nc",
         help="""
-        Ignore the cached webpages to force refetching from website
+        Ignore cache to force refetching from the website
         """.strip(),
-
+        is_flag=True,
     )
     # TODO: add an option to start from specific point in catalog
 ):
@@ -108,8 +108,8 @@ def get(
         logging.fatal('Scraper type "%s" not supported.', site_config["type"])
         raise typer.Abort()
 
-    # scrape the data
-    data = scraper.get(useCache, limit)
+    # scrape the data (use flip of noCache as useCache arg)
+    data = scraper.get(not noCache, limit)
 
     # dump the data to the console
     json.dump(data, indent=2, fp=sys.stdout)
