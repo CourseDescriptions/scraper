@@ -55,16 +55,18 @@ class ModernCampusScraper:
             data = {
                 "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
                 "title": get_field_from_soup(soup, self.config["selectors"].get("title")),
-                "description": extract(soup),
+                "description": get_field_from_soup(soup, self.config["selectors"].get("description"))\
+                    if "description" in self.config["selectors"] else extract(soup),
                 "url": url,
             }
         except Exception as e:
-            logging.error(f"Encountered error while extracting data from {url}\n Trying to refetch")
+            logging.error(f"Encountered error {e} while extracting data from {url}\n Trying to refetch")
             soup = fetch_soup(url, False)
             data = {
                 "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
                 "title": get_field_from_soup(soup, self.config["selectors"].get("title")),
-                "description": extract(soup),
+                "description": get_field_from_soup(soup, self.config["selectors"].get("description"))\
+                    if "description" in self.config["selectors"] else extract(soup),
                 "url": url,
             }
 
