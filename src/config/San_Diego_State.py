@@ -4,31 +4,12 @@ def get_desc(el):
     # Find the course title
     title = el.select_one("#course_preview_title")
 
-    # # Find the next non-empty sibling (if it's an empty <strong> tag, skip it)
-    # siblings = title.find_all_next("strong")
-
-    # # Find the first sibling with text after an empty <strong> tag
-    # for strong in siblings:
-    #     if not strong.get_text(strip=True):
-    #         print(strong.text)
-    #         print(strong.find_next_sibling())
-
-    # Find the next empty <strong> and get the text that follows
+    # Get all text in course description block
     texts = []
     for child in title.parent.contents:
         text = child.text.strip()
-        # if len(text) == 0: continue
-        # if "Print-Friendly Page" in text: continue
-        # if "Units:" in text: continue
-        # if "Minimum grade of C" in text: continue
-        # if "Proof of completion of prerequisite(s) required: Copy of transcript." in text: continue
-        # if "LCR:" in text: continue
-        # if "Grading Method:" in text: continue
-        # if "Prerequisite(s):" in text: continue
-        # if "Formerly numbered" in text: continue
-        # if "Note:" in text: continue
-        # if "Maximum credits:" in text: continue
         texts.append(text)
+
     # get rid of everything before prereqs > grading method > units
     if "Prerequisite(s):" in texts:
         texts = texts[texts.index("Prerequisite(s):")+1 : ]
@@ -36,7 +17,6 @@ def get_desc(el):
         texts = texts[texts.index("Grading Method:")+1 : ]
     elif "Units:" in texts:
         texts = texts[texts.index("Units:")+1 : ]
-    # TODO: clip til after first instance of a double (triple?) break
 
     # get rid of everything after formerly numbered > maximum credits > note (maybe unecessary)
     if "May be repeated with new content." in texts:
@@ -48,7 +28,7 @@ def get_desc(el):
     elif "Note:" in texts:
         texts = texts[ : texts.index("Note:")]
 
-    # get first instance of sublist ['', '', ''] which seems consistent?
+    # get first instance of sublist ['', '', ''] which seems consistent marker before description?
     target = ['', '', '']
 
     res = -1 # boolean variable 
