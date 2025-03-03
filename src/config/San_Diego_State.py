@@ -31,12 +31,11 @@ def get_desc(el):
     # get first instance of sublist ['', '', ''] which seems consistent marker before description?
     target = ['', '', '']
 
-    res = -1 # boolean variable 
+    res = -1 
     for idx in range(len(texts) - len(target) + 1):
         if texts[idx: idx + len(target)] == target:
             res = idx
             break
-    # get first instance of actual text after target sublist
     if res == -1:
         logging.error("Could not find target sublist when looking for course description")
         return ""
