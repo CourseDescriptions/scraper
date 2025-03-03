@@ -8,6 +8,6 @@ def get_config(): return {
         ],
         "title": lambda el: el.select_one("#course_preview_title").text.split("\xa0-\xa0")[
             1
-        ],
+        ]
     }
 }
