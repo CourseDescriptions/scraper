@@ -3,8 +3,8 @@ def get_config(): return {
   "type": "courseleaf",
   "subjectCodesUrl": "https://catalog.csusb.edu/coursesaz/",
   "selectors": {
-      "code": ".detail-code",
-      "title": ".detail-title",
-      "description": ".courseblockextra:not(.noindent)",
+      "code": lambda el: el.select_one(".coursetitle").text.split(". ")[0],
+      "title": lambda el: el.select_one(".coursetitle").text.split(". ")[1],
+      "description": ".courseblockdesc",
   }
 }
