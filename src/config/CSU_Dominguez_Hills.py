@@ -1,6 +1,8 @@
+from scraper.courseleaf import CourseLeafScraper
+
 def get_config(): return {
     "name": "CSU Dominguez Hills",
-    "type": "courseleaf",
+    "type": CourseLeafScraper,
     "subjectCodesUrl": "https://catalog.csudh.edu/courses/",
     "selectors": {
         "code": lambda el: el.select_one(".detail-code").text.rstrip("."),

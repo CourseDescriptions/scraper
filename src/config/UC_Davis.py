@@ -1,6 +1,8 @@
+from scraper.courseleaf import CourseLeafScraper
+
 def get_config(): return {
   "name": "UC Davis",
-  "type": "courseleaf",
+  "type": CourseLeafScraper,
   "subjectCodesUrl": "https://catalog.ucdavis.edu/courses-subject-code/",
   "selectors": {
       "code": ".detail-code b",

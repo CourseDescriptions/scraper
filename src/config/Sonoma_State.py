@@ -1,3 +1,4 @@
+from scraper.moderncampus import ModernCampusScraper
 import logging
 
 def get_desc(el):
@@ -35,7 +36,7 @@ def get_desc(el):
 
 def get_config(): return {
     "name": "Sonoma State",
-    "type": "moderncampus",
+    "type": ModernCampusScraper,
     "startUrl": "https://catalog.sonoma.edu/content.php?catoid=11&navoid=1421",
     "selectors": {
         "code": lambda el: el.select_one("#course_preview_title").text.split("\xa0-\xa0")[

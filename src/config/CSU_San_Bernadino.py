@@ -1,6 +1,8 @@
+from scraper.courseleaf import CourseLeafScraper
+
 def get_config(): return {
   "name": "CSU San Bernadino",
-  "type": "courseleaf",
+  "type": CourseLeafScraper,
   "subjectCodesUrl": "https://catalog.csusb.edu/coursesaz/",
   "selectors": {
       "code": lambda el: el.select_one(".coursetitle").text.split(". ")[0],

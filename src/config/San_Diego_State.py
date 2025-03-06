@@ -1,3 +1,4 @@
+from scraper.moderncampus import ModernCampusScraper
 import logging
 
 def get_desc(el):
@@ -47,7 +48,7 @@ def get_desc(el):
 
 def get_config(): return {
     "name": "San Diego State",
-    "type": "moderncampus",
+    "type": ModernCampusScraper,
     "startUrl": "https://catalog.sdsu.edu/content.php?catoid=9&navoid=776",
     "selectors": {
         "code": lambda el: el.select_one("#course_preview_title").text.split("\xa0-\xa0")[

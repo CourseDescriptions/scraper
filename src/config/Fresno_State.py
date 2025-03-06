@@ -1,6 +1,8 @@
+from scraper.moderncampus import ModernCampusScraper
+
 def get_config(): return {
   "name": "Fresno State",
-  "type": "moderncampus",
+  "type": ModernCampusScraper,
   "startUrl": "https://catalog.fresnostate.edu/content.php?catoid=5&navoid=193",
   "selectors": {
       "code": lambda el: el.select_one("#course_preview_title").text.split("\xa0-\xa0")[

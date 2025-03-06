@@ -1,6 +1,8 @@
+from scraper.moderncampus import ModernCampusScraper
+
 def get_config(): return {
     "name": "Stanislaus State",
-    "type": "moderncampus",
+    "type": ModernCampusScraper,
     "startUrl": "https://catalog.csustan.edu/content.php?catoid=32&navoid=5713",
     "selectors": {
         "code": lambda el: el.select_one("#course_preview_title").text.split("\xa0-\xa0")[

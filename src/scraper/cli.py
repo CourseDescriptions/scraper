@@ -99,17 +99,18 @@ def get(
     site_config = SITES[site_id]
 
     # use specified scraper type
-    if site_config["type"] == "courseleaf":
-        scraper = CourseLeafScraper(site_config)
-    elif site_config["type"] == "moderncampus":
-        scraper = ModernCampusScraper(site_config)
-    elif site_config["type"] == "ucla":
-        scraper = UclaScraper(site_config)
-    elif site_config["type"] == "ucsc":
-        scraper = UcscScraper(site_config)
-    else:
-        logging.fatal('Scraper type "%s" not supported.', site_config["type"])
-        raise typer.Abort()
+    scraper = site_config["type"](site_config)
+    # if site_config["type"] == "courseleaf":
+    #     scraper = CourseLeafScraper(site_config)
+    # elif site_config["type"] == "moderncampus":
+    #     scraper = ModernCampusScraper(site_config)
+    # elif site_config["type"] == "ucla":
+    #     scraper = UclaScraper(site_config)
+    # elif site_config["type"] == "ucsc":
+    #     scraper = UcscScraper(site_config)
+    # else:
+    #     logging.fatal('Scraper type "%s" not supported.', site_config["type"])
+    #     raise typer.Abort()
 
     # scrape the data (use flip of noCache as useCache arg)
     data = scraper.get(not noCache, limit)

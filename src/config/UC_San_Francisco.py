@@ -1,6 +1,8 @@
+from scraper.courseleaf import CourseLeafScraper
+
 def get_config(): return {
   "name": "UC San Francisco",
-  "type": "courseleaf",
+  "type": CourseLeafScraper,
   "subjectCodesUrl": "https://catalog.ucsf.edu/course-catalog/",
   "selectors": {
       "code": ".detail-code",

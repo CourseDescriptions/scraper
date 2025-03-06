@@ -1,6 +1,8 @@
+from scraper.courseleaf import CourseLeafScraper
+
 def get_config(): return {
   "name": "CSU Bakersfield",
-  "type": "courseleaf",
+  "type": CourseLeafScraper,
   "subjectCodesUrl": "https://catalog.csub.edu/course-descriptions/",
   "selectors": {
       "code": ".detail-code",

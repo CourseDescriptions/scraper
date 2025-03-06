@@ -1,6 +1,8 @@
+from scraper.courseleaf import CourseLeafScraper
+
 def get_config(): return {
   "name": "UC Berkeley",
-  "type": "courseleaf",
+  "type": CourseLeafScraper,
   "subjectCodesUrl": "https://guide.berkeley.edu/courses/",
   "selectors": {
       "code": ".courseblocktitle .code",
