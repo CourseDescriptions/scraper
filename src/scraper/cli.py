@@ -22,6 +22,7 @@ from config import SITES
 from scraper.moderncampus import ModernCampusScraper
 from scraper.courseleaf import CourseLeafScraper
 from scraper.ucla import UclaScraper
+from scraper.ucsc import UcscScraper
 
 cli = typer.Typer(
     add_completion=False, no_args_is_help=True, pretty_exceptions_show_locals=False
@@ -104,6 +105,8 @@ def get(
         scraper = ModernCampusScraper(site_config)
     elif site_config["type"] == "ucla":
         scraper = UclaScraper(site_config)
+    elif site_config["type"] == "ucsc":
+        scraper = UcscScraper(site_config)
     else:
         logging.fatal('Scraper type "%s" not supported.', site_config["type"])
         raise typer.Abort()
