@@ -18,21 +18,19 @@ class UcscScraper:
         soup = fetch_soup(url)
         courseList = soup.select_one(".courselist")
         names = courseList.select(".course-name")
-        print("NAMES:", names)
 
         data = []
         for name in names:
-            code = name.select_one("span")
-            title = code.findNextSibling().text
-            desc = name.nextSibling(".desc").text
+            code = name.select_one("span").text.strip()
+            title = name.select_one("a").text.replace(code, "").strip()
+            desc = name.findNextSibling("div").text.strip()
 
             course = {
-                "code": code.text,
+                "code": code,
                 "title": title,
                 "description": desc,
                 "url": url,
             }
-            print("COURSE:", course)
             data.append(course)
 
         return data
