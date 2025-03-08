@@ -26,17 +26,11 @@ class CourseLeafScraper:
         soup = fetch_soup(url)
 
         try:
-            data = [
-                {
-                    **{
-                        field: get_field_from_soup(
-                            el, self.config["selectors"].get(field)
-                        )
-                        for field in ["code", "title", "description"]
-                    },
-                    **{"url": url},
-                }
-                for el in soup.select(".courseblock")
+            data = [ {
+                    **{field: get_field_from_soup(el, self.config["selectors"].get(field))
+                        for field in ["code", "title", "description"]},
+                    **{"url": url}
+                } for el in soup.select(".courseblock")
             ]
         except ValueError as e:
             logging.fatal("Could not extract data from %s", url)
