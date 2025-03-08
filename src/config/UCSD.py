@@ -1,4 +1,6 @@
 from scraper.common import fetch_soup
+import logging
+from time import sleep
 
 BASE_LINK = "https://catalog.ucsd.edu"
 
@@ -14,14 +16,45 @@ class UCSDScraper:
         return [BASE_LINK + link["href"][2:] for link in links if link.text=="courses"]
 
     def get_courses(self, url: str) -> list[dict]:
-        return []
+        soup = fetch_soup(url)
+        courseNames = soup.select(".course-name")
+        
+        data = []
+        for name in courseNames:
+            nameText = name.text.strip().replace("\u00a0", " ")
+            try:
+                split = nameText.split(". ")
+                if len(split) > 1:
+                    code = split[0]
+                    title = split[1]
+                else: # some courses (like 7 or 8) neglect the space
+                    split = nameText.split(".")
+                    code = split[0]
+                    title = split[1]
+                title = title[:title.find(" (")] # remove unit numbers
+            except IndexError:
+                logging.error(f"Couldn't split course title correctly, ignoring {nameText}")
+                continue
+            desc = name.findNextSibling().text.strip()
+            if desc.find("Prerequisites:") != -1:
+                desc = desc[:desc.find("Prerequisites:")].strip()
+
+            course = {
+                "code": code,
+                "title": title,
+                "description": desc,
+                "url": url,
+            }
+            data.append(course)
+        return data
 
     def get(self, useCache: bool, limit: int | None = None) -> list[dict]:
         coursePageUrls = self.get_department_urls()
 
-        print("URLS:", coursePageUrls)
-
         data = []
+
+        for page in coursePageUrls:
+            data.extend(self.get_courses(page))
 
         return data
 
