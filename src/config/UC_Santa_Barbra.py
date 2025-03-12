@@ -1,8 +1,11 @@
 from scraper.common import fetch_soup
+import logging
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 BASE_LINK = "https://catalog.ucsb.edu"
 
@@ -17,19 +20,21 @@ class UcsbScraper:
                 if "overview" in link["href"]]
 
     def get_dept_course_urls(self, dept_name: str) -> list[str]:
-        # going to have to use selenium from this part :(
-
         driver = webdriver.Firefox()
         driver.get(f"{BASE_LINK}/departments/{dept_name}/courses")
-        element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "coursesTabContent"))
-        )
-        links = element.find_elements(By.TAG_NAME, "a")
-        hrefs = [link.get_attribute("href") for link in links]
-        print("HREFS:", hrefs)
-        driver.close()
+        try:
+            element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, "coursesTabContent"))
+            )
+        except TimeoutException:
+            logging.error(f"Waited too long while trying to get course urls from {BASE_LINK}/departments/{dept_name}/courses, skipping!")
+        else:
+            links = element.find_elements(By.TAG_NAME, "a")
+            hrefs = [link.get_attribute("href") for link in links]
+            print("HREFS:", hrefs)
+            driver.close()
 
-        return hrefs
+            return hrefs
 
 
     def get_course(self, url: str) -> list[dict]:
@@ -52,6 +57,9 @@ class UcsbScraper:
         courseUrls = []
         for dept in departments:
             courseUrls.extend(self.get_dept_course_urls(dept))
+            if limit and len(courseUrls) > limit:
+                courseUrls = courseUrls[:limit]
+                break
 
         data = []
         for url in courseUrls:
