@@ -60,6 +60,6 @@ class UCSDScraper:
 
 
 def get_config(): return {
-  "name": "UC San Francisco",
+  "name": "UC San Diego",
   "type": UCSDScraper,
 }

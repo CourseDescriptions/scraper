@@ -36,7 +36,7 @@ def get_cache_path_for_url(url: str, ext: str = "html") -> Path:
     return CACHE_DIR / host / f"{quoted}.{ext}.gz" # / operator concatenates paths
 
 
-def _fetch(url: str, cache_path: Path, useCache: bool) -> str:
+def _fetch(url: str, cache_path: Path, useCache: bool = True) -> str:
     """Fetch the contents of the given URL."""
     # if course is already in cache, return it
     if useCache and cache_path.exists():

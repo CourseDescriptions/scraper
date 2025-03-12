@@ -81,7 +81,15 @@ def get(
         Ignore cache to force refetching from the website
         """.strip(),
         is_flag=True,
-    )
+    ),
+    id_num: int = typer.Option(
+        None,
+        "--id",
+        "-id",
+        help="""
+        Add an id field to each course's output JSON
+        """.strip(),
+    ),
     # TODO: add an option to start from specific point in catalog
 ):
     # make a cache
@@ -105,6 +113,9 @@ def get(
 
     # scrape the data (use flip of noCache as useCache arg)
     data = scraper.get(not noCache, limit)
+    if id_num != None:
+        for course in data:
+            course.update({"school_id": id_num})
 
     # dump the data to the console
     json.dump(data, indent=2, fp=sys.stdout)
