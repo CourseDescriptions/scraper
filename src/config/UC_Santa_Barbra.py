@@ -28,26 +28,42 @@ class UcsbScraper:
             )
         except TimeoutException:
             logging.error(f"Waited too long while trying to get course urls from {BASE_LINK}/departments/{dept_name}/courses, skipping!")
-        else:
-            links = element.find_elements(By.TAG_NAME, "a")
-            hrefs = [link.get_attribute("href") for link in links]
-            print("HREFS:", hrefs)
-            driver.close()
+            return []
+        
+        links = element.find_elements(By.TAG_NAME, "a")
+        hrefs = [link.get_attribute("href") for link in links]
+        print("HREFS:", hrefs)
+        driver.close()
 
-            return hrefs
+        return hrefs
 
 
     def get_course(self, url: str) -> list[dict]:
         soup = fetch_soup(url)
+        main = soup.select_one("#main-content")
 
-        print(url)
+        codeTitle = main.select_one(".heading-5.mb-2").text.strip()
 
-        # return {
-        #     "code": code,
-        #     "title": title,
-        #     "description": desc,
-        #     "url": url
-        # }
+        code = codeTitle.split(" - ")[0]
+        title = codeTitle.split(" - ")[1]
+
+        labels = main.select(".field-label")
+        descLabels = [label for label in labels
+            if "Course Description" in label.text]
+        
+        if len(descLabels) == 0:
+            logging.error("Could not find description for course", url)
+            desc = ""
+        else:
+            desc = descLabels[0].find_next_sibling().text.strip()
+
+
+        return {
+            "code": code,
+            "title": title,
+            "description": desc,
+            "url": url
+        }
 
     def get(self, useCache: bool, limit: int | None = None) -> list[dict]:
         departments = self.get_department_names()
