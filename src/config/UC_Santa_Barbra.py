@@ -1,5 +1,6 @@
 from scraper.common import fetch_soup
 import logging
+from time import sleep
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -21,14 +22,22 @@ class UcsbScraper:
 
     def get_dept_course_urls(self, dept_name: str) -> list[str]:
         driver = webdriver.Firefox()
-        driver.get(f"{BASE_LINK}/departments/{dept_name}/courses")
-        try:
-            element = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, "coursesTabContent"))
-            )
-        except TimeoutException:
-            logging.error(f"Waited too long while trying to get course urls from {BASE_LINK}/departments/{dept_name}/courses, skipping!")
-            return []
+        for i in range(3):
+            print("Getting, try:", i)
+            driver.get(f"{BASE_LINK}/departments/{dept_name}/courses")
+            try:
+                element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "coursesTabContent"))
+                )
+                break
+            except TimeoutException:
+                if driver.find_elements(By.ID, "captcha-container"):
+                    sleep(30)
+                    continue
+                logging.error(f"Waited too long while trying to get course urls from\
+                              {BASE_LINK}/departments/{dept_name}/courses, skipping!")
+                driver.close()
+                return []
         
         links = element.find_elements(By.TAG_NAME, "a")
         hrefs = [link.get_attribute("href") for link in links]
