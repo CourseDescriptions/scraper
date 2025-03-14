@@ -32,7 +32,7 @@ class UcsbScraper:
         
         links = element.find_elements(By.TAG_NAME, "a")
         hrefs = [link.get_attribute("href") for link in links]
-        print("HREFS:", hrefs)
+        # print("HREFS:", hrefs)
         driver.close()
 
         return hrefs
@@ -68,7 +68,7 @@ class UcsbScraper:
     def get(self, useCache: bool, limit: int | None = None) -> list[dict]:
         departments = self.get_department_names()
 
-        print("DEPTS:", departments)
+        # print("DEPTS:", departments)
 
         courseUrls = []
         for dept in departments:
