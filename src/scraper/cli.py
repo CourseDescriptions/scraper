@@ -124,9 +124,15 @@ def get(
         os.mkdir("data")
     except FileExistsError:
         pass
+    # make a dir to dump specifically this school to
+    try:
+        os.mkdir(f"data/{site_id}")
+    except FileExistsError:
+        pass
+
     # dump the json, prepend current time of scraping
     now = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
-    with open("data/" + site_id + "_" + now + ".json", "w+") as f:
+    with open(f"data/{site_id}/{now}.json", "w+") as f:
         json.dump(data, f)
 
 
