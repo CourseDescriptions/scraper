@@ -9,7 +9,10 @@ from typing import Callable
 from urllib import parse
 
 import requests
+from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup, Tag
+
+from time import sleep
 
 CACHE_DIR = Path(__file__).parent.parent.parent / "cache"
 
@@ -47,11 +50,8 @@ def _fetch(url: str, cache_path: Path, useCache: bool = True) -> str:
     # fetch url
     logging.info(f"Requesting {url}")
     response = requests.get(url)
-    # TODO: try this and except to attempt waiting and refetching?
     response.raise_for_status() # check for http error
 
-    # do we want to normalize response.text before writing/returning?
-    # https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize
     # compress text and write to cache
     with gzip.open(cache_path, "wt", encoding="utf-8") as _fh:
         _fh.write(response.text)
@@ -61,9 +61,26 @@ def _fetch(url: str, cache_path: Path, useCache: bool = True) -> str:
 
 def fetch_soup(url: str, useCache: bool = True) -> Tag:
     """Fetch the contents of the given URL and parse as HTML."""
+    print("URL:", url)
     cache_path = get_cache_path_for_url(url, ext="html")
     response_text = _fetch(url, cache_path, useCache)
     return BeautifulSoup(response_text, "lxml")
+
+
+def fetch_soup_retries(url: str, useCache: bool = True, retryWait: int = 5, numRetries: int = 3, exponentialBackoff: bool = False) -> Tag:
+    for i in range(numRetries):
+        try:
+            soup = fetch_soup(url, useCache)
+            return soup
+        except HTTPError:
+            logging.info(f"Failed to get url: {url} on attempt {i+1}")
+            if i == numRetries - 1: continue # don't wait if this was last attempt
+            if exponentialBackoff:
+                sleep(retryWait ** (i+1))
+            else:
+                sleep(retryWait)
+            continue
+    logging.error(f"Max retires reached for url: {url}")
 
 
 def fetch_json(url: str) -> dict:
