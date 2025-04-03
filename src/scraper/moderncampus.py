@@ -50,7 +50,7 @@ class ModernCampusScraper:
         """Extract information from the given course page."""
         soup = fetch_soup(url, useCache)
 
-
+        # Do this with the fetch retry instead probably? Or at least add delay
         try:
             data = {
                 "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
