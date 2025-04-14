@@ -54,7 +54,7 @@ def list_ids():
         print(site_id)
 
 
-# get logic for a site
+# logic for saving a catalog
 def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_num: int | None = None):
     # make a cache
     try:
@@ -68,12 +68,11 @@ def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_
         logging.fatal('Configuration for site "%s" not found.', site_id)
         raise typer.Abort()
 
+    # TODO: check if SITES is loading every single scraper multiple times?
     site_config = SITES[site_id]
 
     # use specified scraper type on site's config dict
     scraper = site_config["type"](site_config)
-    # logging.fatal('Scraper type "%s" not supported.', site_config["type"])
-    # raise typer.Abort()
 
     # scrape the data (use flip of noCache as useCache arg)
     data = scraper.get(not noCache, limit)
@@ -131,7 +130,6 @@ def get(
         Add an id field to each course's output JSON
         """.strip(),
     ),
-    # TODO: add an option to start from specific point in catalog
 ):
     get_logic(site_id, limit, noCache, id_num)
     
@@ -148,41 +146,12 @@ def get_all(noCache: bool = typer.Option(
         is_flag=True,
     ),
 ):
-    school_ids = {
-        "UC_Berkeley": 0,
-        "UC_Davis": 1,
-        "UC_Irvine": 2,
-        "UCLA": 3,
-        "UC_Merced": 4,
-        "UC_Riverside": 5,
-        "UC_San_Diego": 6,
-        "UC_San_Francisco": 7,
-        "UC_Santa_Barbara": 8,
-        "UC_Santa_Cruz": 9,
-        "CSU_Bakersfield": 10,
-        "CSU_Channel_Islands": 11,
-        "Chico_State": 12,
-        "CSU_Dominguez_Hills": 13,
-        "CSU_East_Bay": 14,
-        "Fresno_State": 15,
-        "CSU_Fullerton": 16,
-        "Cal_Poly_Humboldt": 17,
-        "CSU_Long_Beach": 18,
-        "Cal_State_LA": 19,
-        "Cal_Maritime": 20,
-        "CSU_Monterey_Bay": 21,
-        "CSUN": 22,
-        "Cal_Poly_Pomona": 23,
-        "Sacramento_State": 24,
-        "CSU_San_Bernardino": 25,
-        "San_Diego_State": 26,
-        "San_Francisco_State": 27,
-        "San_Jose_State": 28,
-        "Cal_Poly_San_Luis_Obispo": 29,
-        "CSU_San_Marcos": 30,
-        "Sonoma_State": 31,
-        "Stanislaus_State": 32,
-    }
+    with open("school_ids.txt") as f:
+        school_ids = f.readlines()
+    school_ids = {line.split(",")[1].rstrip(): line.split(",")[0].rstrip() for line in school_ids}
+
+    print(school_ids)
+
     for site_id in SITES:
         get_logic(site_id, noCache=noCache, id_num=school_ids[site_id])
 
