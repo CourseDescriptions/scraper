@@ -1,5 +1,6 @@
 from scraper.moderncampus import ModernCampusScraper
 import logging
+from scraper.common import normalize_text
 
 def get_desc(el):
     # Find the course title
@@ -51,10 +52,10 @@ def get_config(): return {
     "type": ModernCampusScraper,
     "startUrl": "https://catalog.sdsu.edu/content.php?catoid=9&navoid=776",
     "selectors": {
-        "code": lambda el: el.select_one("#course_preview_title").text.split("\xa0-\xa0")[
+        "code": lambda el: normalize_text(el.select_one("#course_preview_title").text).split(" - ")[
             0
         ],
-        "title": lambda el: el.select_one("#course_preview_title").text.split("\xa0-\xa0")[
+        "title": lambda el: normalize_text(el.select_one("#course_preview_title").text).split(" - ")[
             1
         ],
         "description": lambda el: get_desc(el)
