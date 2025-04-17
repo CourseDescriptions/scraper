@@ -23,34 +23,7 @@ cli = typer.Typer(
     add_completion=False, no_args_is_help=True, pretty_exceptions_show_locals=False
 )
 
-def setup_logging():
-    # Create a root logger
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)  # Capture all levels
-
-    # Console handler: all messages
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
-    console_formatter = logging.Formatter(
-        '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
-    console_handler.setFormatter(console_formatter)
-
-    # File handler: only errors and above
-    file_handler = logging.FileHandler('errors.log')
-    file_handler.setLevel(logging.ERROR)
-    file_formatter = logging.Formatter(
-        '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s'
-    )
-    file_handler.setFormatter(file_formatter)
-
-    # Add handlers only if they aren't already added
-    if not logger.handlers:
-        logger.addHandler(console_handler)
-        logger.addHandler(file_handler)
-
-
+    
 @cli.callback()
 def common_options(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
@@ -63,7 +36,34 @@ def common_options(
         print(__version__)
         raise SystemExit
 
-    setup_logging()
+    # setup logging
+    # Create a root logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)  # Capture all levels
+
+    # Console handler: info by default, or user specified
+    log_level = logging.INFO
+    if verbose: log_level = logging.DEBUG 
+    if quiet: log_level = logging.CRITICAL
+    rich_handler = RichHandler(
+        markup=False,
+        console=Console(width=180),
+        show_time=True,
+        show_level=True,
+        show_path=True
+    )
+    rich_handler.setLevel(log_level)
+
+    # File handler: only errors and above
+    file_handler = logging.FileHandler('errors.log')
+    file_handler.setLevel(logging.ERROR)
+    file_formatter = logging.Formatter(
+        '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s'
+    )
+    file_handler.setFormatter(file_formatter)
+
+    logger.addHandler(rich_handler)
+    logger.addHandler(file_handler)
 
 
 # list all schools with configs
