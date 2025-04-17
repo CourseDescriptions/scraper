@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 from time import sleep
 from typing import Tuple
 
@@ -65,11 +66,11 @@ class ModernCampusScraper:
                 return data
             except Exception as e:
                 if i == DATA_EXTRACT_NUM_RETRIES - 1: continue # if last loop don't sleep
+                logger.info(f"Encountered error {e} while extracting data from {url}... sleeping 3 and then trying to refetch")
                 sleep(DATA_EXTRACT_SLEEP_SECS)
-                logging.error(f"Encountered error {e} while extracting data from {url}... sleeping 3 and then trying to refetch")
                 continue
 
-        logging.error(f"Failed and couldn't recover while extracting data from {url}, continuing")
+        logger.error(f"Failed and couldn't recover while extracting data from {url}, continuing")
         return None
 
     def extract_urls_from_catalog_page_soup(self, soup: Tag) -> list[Tuple[str, str]]:
@@ -97,7 +98,7 @@ class ModernCampusScraper:
         if current_page is None or last_page is None:
             raise Exception("Could not determine number of catalog pages -- aborting")
 
-        logging.debug("%s catalog pages found", last_page)
+        logger.debug("%s catalog pages found", last_page)
 
         urls = self.extract_urls_from_catalog_page_soup(soup)
 
@@ -108,7 +109,7 @@ class ModernCampusScraper:
             try:
                 assert current_page == str(i)
             except AssertionError as e:
-                logging.error(f"Though current_page would be {i}, was {current_page}\nWaiting 5s and then refetching")
+                logger.error(f"Though current_page would be {i}, was {current_page}\nWaiting 5s and then refetching")
                 sleep(5)
                 soup = fetch_soup(self.config["startUrl"] + f"&filter[cpage]={i}", False)
                 current_page = getattr(soup.select_one("[aria-current=page]"), "text", None)
@@ -121,8 +122,9 @@ class ModernCampusScraper:
                 urls = urls[:limit]
                 break
 
-        logging.debug("%d course pages found", len(urls))
+        logger.debug("%d course pages found", len(urls))
 
         data = [self.extract_data_from_course_page_url(url, useCache) for _title, url in urls]
+        data = [course for course in data if course] # remove null courses from failed scrapes
 
         return data

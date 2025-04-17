@@ -3,6 +3,8 @@
 import gzip
 import json
 import logging
+logger = logging.getLogger(__name__)
+
 import re
 from pathlib import Path
 from typing import Callable
@@ -43,12 +45,12 @@ def _fetch(url: str, cache_path: Path, useCache: bool = True) -> str:
     """Fetch the contents of the given URL."""
     # if course is already in cache, return it
     if useCache and cache_path.exists():
-        logging.info(f"Getting cached {url}")
+        logger.info(f"Getting cached {url}")
         with gzip.open(cache_path, "rt", encoding="utf-8") as _fh:
             return _fh.read()
 
     # fetch url
-    logging.info(f"Requesting {url}")
+    logger.info(f"Requesting {url}")
     response = requests.get(url)
     response.raise_for_status() # check for http error
 
@@ -74,14 +76,14 @@ def fetch_soup_retries(url: str, useCache: bool = True, retryWait: int = 5, numR
             soup = fetch_soup(url, useCache)
             return soup
         except HTTPError:
-            logging.info(f"Failed to get url: {url} on attempt {i+1}")
+            logger.info(f"Failed to get url: {url} on attempt {i+1}")
             if i == numRetries - 1: continue # don't wait if this was last attempt
             if exponentialBackoff:
                 sleep(retryWait ** (i+1))
             else:
                 sleep(retryWait)
             continue
-    logging.error(f"Max retires reached for url: {url}")
+    logger.error(f"Max retires reached for url: {url}")
 
 
 def fetch_json(url: str) -> dict:

@@ -1,5 +1,6 @@
 from scraper.moderncampus import ModernCampusScraper
 import logging
+logger = logging.getLogger("__name__")
 from scraper.common import normalize_text
 
 def get_desc(el):
@@ -24,7 +25,7 @@ def get_desc(el):
             res = idx
             break
     if res == -1:
-        logging.error("Could not find target sublist when looking for course description")
+        logger.error("Could not find target sublist when looking for course description")
         return ""
     
     # slice off after target

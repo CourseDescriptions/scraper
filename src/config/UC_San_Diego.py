@@ -1,5 +1,6 @@
 from scraper.common import fetch_soup
 import logging
+logger = logging.getLogger("__name__")
 from time import sleep
 
 BASE_LINK = "https://catalog.ucsd.edu"
@@ -33,7 +34,7 @@ class UCSDScraper:
                     title = split[1]
                 title = title[:title.find(" (")] # remove unit numbers
             except IndexError:
-                logging.error(f"Couldn't split course title correctly, ignoring {nameText}")
+                logger.error(f"Couldn't split course title correctly, ignoring {nameText}")
                 continue
             desc = name.findNextSibling().text.strip()
             if desc.find("Prerequisites:") != -1:

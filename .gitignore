@@ -6,3 +6,4 @@ data
 .ipynb_checkpoints
 *.csv
 .DS_Store
+*.log

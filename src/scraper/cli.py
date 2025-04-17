@@ -23,6 +23,33 @@ cli = typer.Typer(
     add_completion=False, no_args_is_help=True, pretty_exceptions_show_locals=False
 )
 
+def setup_logging():
+    # Create a root logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)  # Capture all levels
+
+    # Console handler: all messages
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    console_formatter = logging.Formatter(
+        '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    console_handler.setFormatter(console_formatter)
+
+    # File handler: only errors and above
+    file_handler = logging.FileHandler('errors.log')
+    file_handler.setLevel(logging.ERROR)
+    file_formatter = logging.Formatter(
+        '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s'
+    )
+    file_handler.setFormatter(file_formatter)
+
+    # Add handlers only if they aren't already added
+    if not logger.handlers:
+        logger.addHandler(console_handler)
+        logger.addHandler(file_handler)
+
 
 @cli.callback()
 def common_options(
@@ -36,15 +63,7 @@ def common_options(
         print(__version__)
         raise SystemExit
 
-    log_level = logging.INFO
-    if verbose: log_level = logging.DEBUG 
-    if quiet: log_level = logging.CRITICAL
-    logging.basicConfig(
-        level=log_level,
-        format="%(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        handlers=[RichHandler(markup=False, console=Console(width=180))],
-    )
+    setup_logging()
 
 
 # list all schools with configs
@@ -56,16 +75,17 @@ def list_ids():
 
 # logic for saving a catalog
 def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_num: int | None = None):
+    logger = logging.getLogger(__name__)
     # make a cache
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
     except OSError:
-        logging.fatal("Could not create cache directory.")
+        logger.fatal("Could not create cache directory.")
         raise typer.Abort() from None
 
     # error if we don't have a config for this site
     if site_id not in SITES:
-        logging.fatal('Configuration for site "%s" not found.', site_id)
+        logger.fatal('Configuration for site "%s" not found.', site_id)
         raise typer.Abort()
 
     # TODO: check if SITES is loading every single scraper multiple times?
@@ -98,6 +118,7 @@ def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_
     now = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     with open(f"data/{site_id}/{now}.json", "w+") as f:
         json.dump(data, f)
+
 
 # command to scrape data from a specific school
 @cli.command()
@@ -133,7 +154,6 @@ def get(
 ):
     get_logic(site_id, limit, noCache, id_num)
     
-
 
 @cli.command()
 def get_all(noCache: bool = typer.Option(

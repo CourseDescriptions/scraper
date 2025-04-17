@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 from typing import Tuple
 
 from scraper.common import fetch_soup, get_field_from_soup, resolve_url
@@ -33,8 +34,8 @@ class CourseLeafScraper:
                 } for el in soup.select(".courseblock")
             ]
         except ValueError as e:
-            logging.fatal("Could not extract data from %s", url)
-            logging.fatal(e)
+            logger.fatal("Could not extract data from %s", url)
+            logger.fatal(e)
             raise SystemExit(1) from None
 
         return data
