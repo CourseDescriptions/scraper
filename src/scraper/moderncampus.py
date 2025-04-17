@@ -11,6 +11,8 @@ from scraper.common import (
     resolve_url,
 )
 
+DATA_EXTRACT_NUM_RETRIES = 2
+DATA_EXTRACT_SLEEP_SECS = 3
 
 def extract(el):
     start = el.select_one("#course_preview_title ~ hr")
@@ -46,31 +48,29 @@ class ModernCampusScraper:
     def __init__(self, site_config: dict) -> None:
         self.config = site_config
 
-    def extract_data_from_course_page_url(self, url: str, useCache: bool = True) -> dict:
+    def extract_data_from_course_page_url(self, url: str, useCache: bool = True) -> dict | None:
         """Extract information from the given course page."""
         soup = fetch_soup(url, useCache)
 
         # Do this with the fetch retry instead probably? Or at least add delay
-        try:
-            data = {
-                "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
-                "title": get_field_from_soup(soup, self.config["selectors"].get("title")),
-                "description": get_field_from_soup(soup, self.config["selectors"].get("description"))\
-                    if "description" in self.config["selectors"] else extract(soup),
-                "url": url,
-            }
-        except Exception as e:
-            logging.error(f"Encountered error {e} while extracting data from {url}\n Trying to refetch")
-            soup = fetch_soup(url, False)
-            data = {
-                "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
-                "title": get_field_from_soup(soup, self.config["selectors"].get("title")),
-                "description": get_field_from_soup(soup, self.config["selectors"].get("description"))\
-                    if "description" in self.config["selectors"] else extract(soup),
-                "url": url,
-            }
+        for i in range(DATA_EXTRACT_NUM_RETRIES):
+            try:
+                data = {
+                    "code": get_field_from_soup(soup, self.config["selectors"].get("code")),
+                    "title": get_field_from_soup(soup, self.config["selectors"].get("title")),
+                    "description": get_field_from_soup(soup, self.config["selectors"].get("description"))\
+                        if "description" in self.config["selectors"] else extract(soup),
+                    "url": url,
+                }
+                return data
+            except Exception as e:
+                if i == DATA_EXTRACT_NUM_RETRIES - 1: continue # if last loop don't sleep
+                sleep(DATA_EXTRACT_SLEEP_SECS)
+                logging.error(f"Encountered error {e} while extracting data from {url}... sleeping 3 and then trying to refetch")
+                continue
 
-        return data
+        logging.error(f"Failed and couldn't recover while extracting data from {url}, continuing")
+        return None
 
     def extract_urls_from_catalog_page_soup(self, soup: Tag) -> list[Tuple[str, str]]:
         # consider using /ajax/preview_course.php?catoid=35&coid=143860&show pages
