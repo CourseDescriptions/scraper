@@ -70,7 +70,7 @@ class ModernCampusScraper:
                 sleep(DATA_EXTRACT_SLEEP_SECS)
                 continue
 
-        logger.error(f"Failed and couldn't recover while extracting data from {url}, continuing")
+        logger.error(f"Failed while extracting data from {url}, continuing")
         return None
 
     def extract_urls_from_catalog_page_soup(self, soup: Tag) -> list[Tuple[str, str]]:
