@@ -8,7 +8,6 @@ import json
 import logging
 import sys
 from pathlib import Path
-import os
 from datetime import datetime
 
 import typer
@@ -16,13 +15,17 @@ from rich import print
 from rich.console import Console
 from rich.logging import RichHandler
 
-CACHE_DIR = Path(__file__).parent.parent.parent / "cache"
 from config import SITES
+
+SCRAPER_ROOT_DIR = Path(__file__).parent.parent.parent
+
+LOG_DIR = SCRAPER_ROOT_DIR / "logs"
+DATA_DIR = SCRAPER_ROOT_DIR / "data"
+CACHE_DIR = SCRAPER_ROOT_DIR / "cache"
 
 cli = typer.Typer(
     add_completion=False, no_args_is_help=True, pretty_exceptions_show_locals=False
 )
-
     
 @cli.callback()
 def common_options(
@@ -55,7 +58,14 @@ def common_options(
     rich_handler.setLevel(log_level)
 
     # File handler: only errors and above
-    file_handler = logging.FileHandler('errors.log')
+    # make logging directory if doesn't exist
+    try:
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        logger.fatal("Could not create log directory.")
+        raise typer.Abort() from None
+    now = datetime.now().strftime("%Y-%m-%d_%H:%M")
+    file_handler = logging.FileHandler(f"logs/{now}_errors.log")
     file_handler.setLevel(logging.ERROR)
     file_formatter = logging.Formatter(
         '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s'
@@ -81,7 +91,7 @@ def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
     except OSError:
         logger.fatal("Could not create cache directory.")
-        raise typer.Abort() from None
+        raise typer.Abort()
 
     # error if we don't have a config for this site
     if site_id not in SITES:
@@ -103,19 +113,16 @@ def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_
     # dump the data to the console
     json.dump(data, indent=2, fp=sys.stdout)
 
-    # make a dir to dump jsons to
+    # make a dir to dump jsons for this school to
+    site_data_dir = DATA_DIR / site_id
     try:
-        os.mkdir("data")
+        # parents true so will make data/ if need be, exist_ok true cause might already exist
+        site_data_dir.mkdir(parents=True, exist_ok=True) 
     except FileExistsError:
-        pass
-    # make a dir to dump specifically this school to
-    try:
-        os.mkdir(f"data/{site_id}")
-    except FileExistsError:
-        pass
+        logger.fatal(f"Could not create {site_data_dir} directory.")
 
     # dump the json, prepend current time of scraping
-    now = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
+    now = datetime.now().strftime("%Y-%m-%d_%H:%M")
     with open(f"data/{site_id}/{now}.json", "w+") as f:
         json.dump(data, f)
 
@@ -169,8 +176,6 @@ def get_all(noCache: bool = typer.Option(
     with open("school_ids.txt") as f:
         school_ids = f.readlines()
     school_ids = {line.split(",")[1].rstrip(): line.split(",")[0].rstrip() for line in school_ids}
-
-    print(school_ids)
 
     for site_id in SITES:
         get_logic(site_id, noCache=noCache, id_num=school_ids[site_id])
