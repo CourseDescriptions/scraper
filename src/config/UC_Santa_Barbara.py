@@ -127,6 +127,6 @@ class UcsbScraper:
         return data
 
 def get_config(): return {
-  "name": "UC_Santa_Barbra",
+  "name": "UC_Santa_Barbara",
   "type": UcsbScraper,
 }
