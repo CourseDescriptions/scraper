@@ -9,6 +9,20 @@ class CourseLeafScraper:
     """Course Descriptions Scraper for "squares"-type sites."""
 
     def __init__(self, site_config: dict) -> None:
+        """
+        config format: {
+            "subjectCodesUrl": string url to department listing page of catalog
+                               (look at other configs for example of which page)
+            "selectors": {
+                "code": selector for course code
+                "title": selector for course title
+                "description": selector for course description
+            }
+        }
+        Selectors can be either strings, and will be treated as a css selector
+        Or they can be a function that returns a string, 
+        in which case the function will be called on the soup of the page
+        """
         self.config = site_config
 
     def extract_subject_code_pages(self) -> list[Tuple[str, str]]:

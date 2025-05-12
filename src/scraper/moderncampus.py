@@ -47,6 +47,21 @@ class ModernCampusScraper:
     """Course Descriptions Scraper for "Modern Campus"-type sites."""
 
     def __init__(self, site_config: dict) -> None:
+        """
+        config format: {
+            "startUrl": string url to department listing page of catalog
+                        (look at other configs for example of which page)
+            "selectors": {
+                "code": selector for course code
+                "title": selector for course title
+                [OPTIONAL] "description": selector for course description
+                                          (defaults to extract() function)
+            }
+        }
+        Selectors can be either strings, and will be treated as a css selector
+        Or they can be a function that returns a string, 
+        in which case the function will be called on the soup of the page
+        """
         self.config = site_config
 
     def extract_data_from_course_page_url(self, url: str, useCache: bool = True) -> dict | None:
@@ -66,7 +81,8 @@ class ModernCampusScraper:
                 return data
             except Exception as e:
                 if i == DATA_EXTRACT_NUM_RETRIES - 1: continue # if last loop don't sleep
-                logger.info(f"Encountered error {e} while extracting data from {url}... sleeping 3 and then trying to refetch")
+                logger.info(f"Encountered error {e} while extracting data from {url}...\
+                            sleeping 3 and then trying to refetch")
                 sleep(DATA_EXTRACT_SLEEP_SECS)
                 continue
 
