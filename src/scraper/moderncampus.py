@@ -49,7 +49,7 @@ class ModernCampusScraper:
     def __init__(self, site_config: dict) -> None:
         """
         config format: {
-            "startUrl": string url to department listing page of catalog
+            "startUrl": string url to all courses list page of catalog
                         (look at other configs for example of which page)
             "selectors": {
                 "code": selector for course code
