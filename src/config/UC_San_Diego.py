@@ -58,6 +58,9 @@ class UCSDScraper:
             data.extend(self.get_courses(page))
 
         return data
+    
+    def get_author(self):
+        return "Rohan Parekh"
 
 
 def get_config(): return {

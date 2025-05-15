@@ -125,6 +125,10 @@ class UcsbScraper:
             data.append(course)
 
         return data
+    
+    def get_author(self):
+        return "Rohan Parekh"
+
 
 def get_config(): return {
     "name": "UC_Santa_Barbara",

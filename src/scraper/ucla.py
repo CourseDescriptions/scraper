@@ -39,3 +39,6 @@ class UclaScraper:
             for course in self.fetch_and_parse_subjectarea_json(_["subj_area_cd"])
         ]
         return data
+
+    def get_author(self):
+        return "Simon Wiles"

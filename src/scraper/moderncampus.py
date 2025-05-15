@@ -144,3 +144,6 @@ class ModernCampusScraper:
         data = [course for course in data if course] # remove null courses from failed scrapes
 
         return data
+
+    def get_author(self):
+        return "Simon Wiles"

@@ -69,3 +69,7 @@ class CourseLeafScraper:
         ]
 
         return data
+
+    
+    def get_author(self):
+        return "Simon Wiles"

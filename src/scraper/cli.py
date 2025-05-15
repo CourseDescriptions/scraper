@@ -84,7 +84,7 @@ def list_ids():
 
 
 # logic for saving a catalog
-def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_num: int | None = None):
+def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_num: int | None = None, user: str | None = None):
     logger = logging.getLogger(__name__)
     # make a cache
     try:
@@ -110,8 +110,20 @@ def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_
         for course in data:
             course.update({"school_id": id_num})
 
-    # dump the data to the console
-    json.dump(data, indent=2, fp=sys.stdout)
+    # construct json with data and metadata
+    now = datetime.now().strftime("%Y-%m-%d_%H:%M")
+    output = {
+        "data": data,
+        "metadata": {
+            "run_datetime": now,
+            "config_author": site_config["author"] if "author" in site_config else "unknown",
+            "scraper_author": scraper.get_author(),
+            "run_by": user if user else "unknown"
+        }
+    }
+
+    # dump the output to the console
+    json.dump(output, indent=2, fp=sys.stdout)
 
     # make a dir to dump jsons for this school to
     site_data_dir = DATA_DIR / site_id
@@ -122,9 +134,8 @@ def get_logic(site_id: str, limit: int | None = None, noCache: bool = False, id_
         logger.fatal(f"Could not create {site_data_dir} directory.")
 
     # dump the json, prepend current time of scraping
-    now = datetime.now().strftime("%Y-%m-%d_%H:%M")
     with open(f"data/{site_id}/{now}.json", "w+") as f:
-        json.dump(data, f)
+        json.dump(output, f)
 
 
 # command to scrape data from a specific school
@@ -158,8 +169,16 @@ def get(
         Add an id field to each course's output JSON
         """.strip(),
     ),
+    user: str = typer.Option(
+        None,
+        "--user",
+        "-u",
+        help="""
+        Specify user running the scraper to include metadata in output JSON
+        """.strip(),
+    ),
 ):
-    get_logic(site_id, limit, noCache, id_num)
+    get_logic(site_id, limit, noCache, id_num, user)
     
 
 @cli.command()
