@@ -46,6 +46,7 @@ class UcscScraper:
         return data
 
 def get_config(): return {
-  "name": "UC_Santa_Cruz",
-  "type": UcscScraper,
+    "name": "UC_Santa_Cruz",
+    "type": UcscScraper,
+    "author": "Rohan Parekh"
 }

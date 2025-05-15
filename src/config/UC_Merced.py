@@ -29,5 +29,6 @@ def get_config(): return {
             1
         ],
         "description": lambda el: extract(el)
-    }
+    },
+    "author": "Rohan Parekh"
 }

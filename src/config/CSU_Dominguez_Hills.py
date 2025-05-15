@@ -13,5 +13,6 @@ def get_config(): return {
             courseblockextra := el.select(".courseblockextra"),
             "" if not len(courseblockextra) > 1 else courseblockextra[0].text,
         )[-1],
-    }
+    },
+    "author": "Rohan Parekh"
 }

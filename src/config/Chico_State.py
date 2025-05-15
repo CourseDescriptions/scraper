@@ -8,5 +8,6 @@ def get_config(): return {
         "code": ".detail-code",
         "title": ".detail-title",
         "description": ".detail-description",
-    }
+    },
+    "author": "Rohan Parekh"
 }

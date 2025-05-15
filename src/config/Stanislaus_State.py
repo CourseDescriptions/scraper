@@ -12,5 +12,6 @@ def get_config(): return {
         "title": lambda el: normalize_text(el.select_one("#course_preview_title").text).split(" - ")[
             1
         ],
-    }
+    },
+    "author": "Rohan Parekh"
 }

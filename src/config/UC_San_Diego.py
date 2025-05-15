@@ -61,6 +61,7 @@ class UCSDScraper:
 
 
 def get_config(): return {
-  "name": "UC_San_Diego",
-  "type": UCSDScraper,
+    "name": "UC_San_Diego",
+    "type": UCSDScraper,
+    "author": "Rohan Parekh"
 }

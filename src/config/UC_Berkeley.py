@@ -15,5 +15,6 @@ def get_config(): return {
           descshow.text,
       )[-1]
       + getattr(el.select_one(".deschide"), "text", ""),
-  }
+  },
+  "author": "Rohan Parekh"
 }

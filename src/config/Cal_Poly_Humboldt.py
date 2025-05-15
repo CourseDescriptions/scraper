@@ -8,5 +8,6 @@ def get_config(): return {
   "selectors": {
       "code": lambda el: normalize_text(el.select_one("#course_preview_title").text).split(" - ")[0],
       "title": lambda el: normalize_text(el.select_one("#course_preview_title").text).split(" - ")[1],
-  }
+  },
+  "author": "Rohan Parekh"
 }

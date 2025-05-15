@@ -11,5 +11,6 @@ def get_config(): return {
       "description": lambda el: getattr(
           el.select_one(".courseblockextra"), "text", ""
       ),
-  }
+  },
+  "author": "Rohan Parekh"
 }

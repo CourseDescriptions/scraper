@@ -12,5 +12,6 @@ def get_config(): return {
           ".  "
       )[1],
       "description": ".courseblockdesc p:first-child",
-  }
+  },
+  "author": "Rohan Parekh"
 }

@@ -14,5 +14,6 @@ def get_config(): return {
           courseblockextra.contents[0].extract(),
           courseblockextra.text,
       )[-1],
-  }
+  },
+  "author": "Rohan Parekh"
 }

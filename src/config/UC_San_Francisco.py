@@ -8,5 +8,6 @@ def get_config(): return {
       "code": ".detail-code",
       "title": ".detail-title",
       "description": ".courseblockextra:not(.noindent)",
-  }
+  },
+  "author": "Rohan Parekh"
 }
