@@ -25,9 +25,9 @@ class CourseLeafScraper:
         """
         self.config = site_config
 
-    def extract_subject_code_pages(self) -> list[Tuple[str, str]]:
+    def extract_subject_code_pages(self, useCache: bool) -> list[Tuple[str, str]]:
         """Extract a list of subject code pages from the given HTML."""
-        soup = fetch_soup(self.config["subjectCodesUrl"])
+        soup = fetch_soup(self.config["subjectCodesUrl"], useCache)
         return [
             (
                 el.text,
@@ -36,9 +36,9 @@ class CourseLeafScraper:
             for el in soup.select(".letternav-head + ul li a")
         ]
 
-    def extract_from_subject_code_page_url(self, url: str) -> list[dict]:
+    def extract_from_subject_code_page_url(self, url: str, useCache: bool) -> list[dict]:
         """Extract information from the given subject code page."""
-        soup = fetch_soup(url)
+        soup = fetch_soup(url, useCache)
 
         try:
             data = [ {
@@ -56,7 +56,7 @@ class CourseLeafScraper:
 
     def get(self, useCache: bool = True, limit: int | None = None) -> list[dict]:
         """Get course descriptions for all subject codes."""
-        subject_code_pages = self.extract_subject_code_pages()
+        subject_code_pages = self.extract_subject_code_pages(useCache)
 
         # limit pages of courses we get (so limit=2 gives all courses from first two departments, alphabetically)
         if limit is not None:
@@ -65,7 +65,7 @@ class CourseLeafScraper:
         data = [
             course_data
             for _title, url in subject_code_pages
-            for course_data in self.extract_from_subject_code_page_url(url)
+            for course_data in self.extract_from_subject_code_page_url(url, useCache)
         ]
 
         return data
