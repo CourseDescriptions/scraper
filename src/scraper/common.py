@@ -69,7 +69,7 @@ def fetch_soup(url: str, useCache: bool = True) -> Tag:
     return BeautifulSoup(response_text, "lxml")
 
 
-def fetch_soup_retries(url: str, useCache: bool = True, retryWait: int = 5, numRetries: int = 3, exponentialBackoff: bool = False) -> Tag:
+def fetch_soup_retries(url: str, useCache: bool = True, retryWait: int = 5, numRetries: int = 3, exponentialBackoff: bool = False) -> Tag | None:
     """Fetch soup but wait and retry on HTTPErrors to avoid rate-limiting"""
     for i in range(numRetries):
         try:
