@@ -31,6 +31,7 @@ cli = typer.Typer(
 def common_options(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
     quiet: bool = typer.Option(False, "--quiet", "-q"),
+    logAll: bool = typer.Option(False, "--log-all", "-la"),
     version: bool = typer.Option(False, "--version"),
 ):
     """Common options:"""
@@ -65,8 +66,9 @@ def common_options(
         logger.fatal("Could not create log directory.")
         raise typer.Abort() from None
     now = datetime.now().strftime("%Y-%m-%d_%H:%M")
-    file_handler = logging.FileHandler(f"logs/{now}_errors.log")
-    file_handler.setLevel(logging.ERROR)
+    file_handler = logging.FileHandler(f"logs/{now}{"_errors" if not logAll else ""}.log")
+    file_log_level = logging.DEBUG if logAll else logging.ERROR
+    file_handler.setLevel(file_log_level)
     file_formatter = logging.Formatter(
         '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s'
     )
@@ -191,13 +193,21 @@ def get_all(noCache: bool = typer.Option(
         """.strip(),
         is_flag=True,
     ),
+    user: str = typer.Option(
+        None,
+        "--user",
+        "-u",
+        help="""
+        Specify user running the scraper to include metadata in output JSON
+        """.strip(),
+    ),
 ):
     with open("school_ids.txt") as f:
         school_ids = f.readlines()
     school_ids = {line.split(",")[1].rstrip(): line.split(",")[0].rstrip() for line in school_ids}
 
     for site_id in SITES:
-        get_logic(site_id, noCache=noCache, id_num=school_ids[site_id])
+        get_logic(site_id, noCache=noCache, id_num=school_ids[site_id], user=user)
 
 
 if __name__ == "__main__":
