@@ -86,10 +86,10 @@ def fetch_soup_retries(url: str, useCache: bool = True, retryWait: int = 5, numR
     logger.error(f"Max retires reached for url: {url}")
 
 
-def fetch_json(url: str) -> dict:
+def fetch_json(url: str, useCache: bool = True) -> dict:
     """Fetch the contents of the given URL and parse as JSON."""
     cache_path = get_cache_path_for_url(url, ext="json")
-    response_text = _fetch(url, cache_path)
+    response_text = _fetch(url, cache_path, useCache)
     return json.loads(response_text)
 
 
