@@ -52,7 +52,11 @@ def _fetch(url: str, cache_path: Path, useCache: bool = True) -> str:
     # fetch url
     logger.info(f"Requesting {url}")
     response = requests.get(url)
-    response.raise_for_status() # check for http error
+    try:
+        response.raise_for_status() # check for http error
+    except HTTPError as e:
+        logger.error(f"HTTP error on url: {url}", exc_info=True)
+        raise
 
     # compress text and write to cache
     with gzip.open(cache_path, "wt", encoding="utf-8") as _fh:
@@ -69,7 +73,7 @@ def fetch_soup(url: str, useCache: bool = True) -> Tag:
     return BeautifulSoup(response_text, "lxml")
 
 
-def fetch_soup_retries(url: str, useCache: bool = True, retryWait: int = 5, numRetries: int = 3, exponentialBackoff: bool = False) -> Tag | None:
+def fetch_soup_retries(url: str, useCache: bool = True, retryWait: int = 5, numRetries: int = 3, exponentialBackoff: bool = False) -> Tag:
     """Fetch soup but wait and retry on HTTPErrors to avoid rate-limiting"""
     for i in range(numRetries):
         try:
@@ -83,7 +87,8 @@ def fetch_soup_retries(url: str, useCache: bool = True, retryWait: int = 5, numR
             else:
                 sleep(retryWait)
             continue
-    logger.error(f"Max retires reached for url: {url}")
+    logger.fatal(f"Max retires reached for url: {url}", exc_info=True)
+    raise
 
 
 def fetch_json(url: str, useCache: bool = True) -> dict:
