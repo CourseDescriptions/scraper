@@ -67,7 +67,7 @@ def common_options(
         raise typer.Abort() from None
     now = datetime.now().strftime("%Y-%m-%d_%H:%M")
     file_handler = logging.FileHandler(f"logs/{now}{"_errors" if not logAll else ""}.log")
-    file_log_level = logging.DEBUG if logAll else logging.ERROR
+    file_log_level = logging.DEBUG if logAll else logging.WARNING
     file_handler.setLevel(file_log_level)
     file_formatter = logging.Formatter(
         '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s'
@@ -202,12 +202,18 @@ def get_all(noCache: bool = typer.Option(
         """.strip(),
     ),
 ):
+    logger = logging.getLogger(__name__)
+    
     with open("school_ids.txt") as f:
         school_ids = f.readlines()
     school_ids = {line.split(",")[1].rstrip(): line.split(",")[0].rstrip() for line in school_ids}
 
     for site_id in SITES:
-        get_logic(site_id, noCache=noCache, id_num=school_ids[site_id], user=user)
+        try:
+            get_logic(site_id, noCache=noCache, id_num=int(school_ids[site_id]), user=user)
+        except Exception as e:
+            logger.fatal(f"Encountered exception while trying to scrape {site_id}, continuing", exc_info=True)
+            continue
 
 
 if __name__ == "__main__":
