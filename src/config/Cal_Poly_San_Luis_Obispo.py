@@ -4,10 +4,11 @@ def get_config(): return {
     "name": "Cal Poly San Luis Obispo",
     "type": CourseLeafScraper,
     "subjectCodesUrl": "https://catalog.calpoly.edu/coursesaz/",
+    "subjectCodeSelector": ".sitemaplink",
     "selectors": {
-      "code": ".detail-code",
-      "title": ".detail-title",
-      "description": ".courseblockextra:not(.noindent)",
+      "code": lambda el: el.select_one(".courseblocktitle strong").text.split(". ")[0],
+      "title": lambda el: el.select_one(".courseblocktitle strong").text.split(". ")[1],
+      "description": ".courseblockdesc",
   },
   "author": "Rohan Parekh"
 }

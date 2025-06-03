@@ -1,5 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
+
+from requests import HTTPError
 from typing import Tuple
 
 from scraper.common import fetch_soup, get_field_from_soup, resolve_url
@@ -28,17 +30,22 @@ class CourseLeafScraper:
     def extract_subject_code_pages(self, useCache: bool) -> list[Tuple[str, str]]:
         """Extract a list of subject code pages from the given HTML."""
         soup = fetch_soup(self.config["subjectCodesUrl"], useCache)
+        code_selector = self.config["subjectCodeSelector"] if "subjectCodeSelector" in self.config else ".letternav-head + ul li a"
         return [
             (
                 el.text,
                 resolve_url(el.attrs["href"], self.config["subjectCodesUrl"]),
             )
-            for el in soup.select(".letternav-head + ul li a")
+            for el in soup.select(code_selector)
         ]
 
     def extract_from_subject_code_page_url(self, url: str, useCache: bool) -> list[dict]:
         """Extract information from the given subject code page."""
-        soup = fetch_soup(url, useCache)
+        try:
+            soup = fetch_soup(url, useCache)
+        except HTTPError as e:
+            logging.error(f"Failed to get subject code page for url {url}, continuing", exc_info=True)
+            return []
 
         try:
             data = [ {
@@ -48,9 +55,13 @@ class CourseLeafScraper:
                 } for el in soup.select(".courseblock")
             ]
         except ValueError as e:
-            logger.fatal("Could not extract data from %s", url)
-            logger.fatal(e)
+            logger.fatal(f"Could not extract data from {url}", exc_info=True)
             raise SystemExit(1) from None
+
+        for course in data:
+            for key, value in course.items():
+                if len(value) == 0:
+                    logger.warning(f"Field {key} has value of length zero for url {url}")
 
         return data
 
