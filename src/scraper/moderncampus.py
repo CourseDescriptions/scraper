@@ -7,6 +7,7 @@ from bs4 import Tag
 
 from scraper.common import (
     fetch_soup,
+    fetch_soup_retries,
     get_field_from_soup,
     normalize_text,
     resolve_url,
@@ -66,7 +67,7 @@ class ModernCampusScraper:
 
     def extract_data_from_course_page_url(self, url: str, useCache: bool = True) -> dict | None:
         """Extract information from the given course page."""
-        soup = fetch_soup(url, useCache)
+        soup = fetch_soup_retries(url, useCache)
 
         # Do this with the fetch retry instead probably? Or at least add delay
         for i in range(DATA_EXTRACT_NUM_RETRIES):
@@ -145,5 +146,5 @@ class ModernCampusScraper:
 
         return data
 
-    def get_author(self):
+    def get_author(self) -> str:
         return "Simon Wiles"
